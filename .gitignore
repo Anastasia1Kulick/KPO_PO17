@@ -1,0 +1,18 @@
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Java
+target/
+*.class
+
+# C++
+*.o
+*.out
