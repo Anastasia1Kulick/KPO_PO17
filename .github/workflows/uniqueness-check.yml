@@ -1,0 +1,51 @@
+name: Uniqueness check
+
+on:
+  pull_request:
+    paths:
+      - 'reports/**'
+
+permissions:
+  contents: read
+
+env:
+  SIMILARITY_FAIL_THRESHOLD: "0.90"
+  SIMILARITY_WARN_THRESHOLD: "0.60"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Determine changed report files
+        id: changed
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          CHANGED=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD -- reports/ | tr '\n' ' ')
+          echo "files=$CHANGED" >> "$GITHUB_OUTPUT"
+          echo "Changed files: $CHANGED"
+
+      - name: Run uniqueness check
+        if: steps.changed.outputs.files != ''
+        run: |
+          python scripts/check_uniqueness.py \
+            --changed-files ${{ steps.changed.outputs.files }} \
+            --fail-threshold "$SIMILARITY_FAIL_THRESHOLD" \
+            --warn-threshold "$SIMILARITY_WARN_THRESHOLD" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: No report files changed
+        if: steps.changed.outputs.files == ''
+        run: echo "Изменений в reports/** не найдено — проверка пропущена." >> "$GITHUB_STEP_SUMMARY"
