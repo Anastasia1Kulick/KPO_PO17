@@ -1,8 +1,12 @@
 # Репозиторий для отчётов и проектов по лабораторным работам
+ссылка на лабораторный практикум:
+https://drive.google.com/drive/folders/1_zFEuzyo7UujEytf5MuwdUKtBnAo8YXg
 
-ссылка на электронную очередь: https://docs.google.com/spreadsheets/d/1FFfxMHh_qEtyVldmp9tDRgwITp5Y6SA4VW2Xh6iDvrs/edit?usp=sharing
+ссылка на электронную очередь: 
+https://docs.google.com/spreadsheets/d/1FFfxMHh_qEtyVldmp9tDRgwITp5Y6SA4VW2Xh6iDvrs/edit?usp=sharing
 
-ссылка на электронную ведомость: https://docs.google.com/spreadsheets/d/1esBjBMWBkn2GBHyKEAzKP-CuAJUphPBEWrAmjG0f6pg/edit?usp=sharing
+ссылка на электронную ведомость: 
+https://docs.google.com/spreadsheets/d/1esBjBMWBkn2GBHyKEAzKP-CuAJUphPBEWrAmjG0f6pg/edit?usp=sharing
 
 ## Порядок работы
 
