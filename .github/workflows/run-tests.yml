@@ -1,0 +1,44 @@
+name: Run student tests
+
+on:
+  pull_request:
+    paths:
+      - 'reports/**'
+
+permissions:
+  contents: read
+
+env:
+  # таймаут на одну лабораторную (в секундах)
+  TEST_TIMEOUT_SECONDS: "300"
+  # требовать ли обязательное наличие tests/run_tests.sh у каждой лабы
+  REQUIRE_TESTS: "true"
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Python, несколько версий JDK, Maven, Gradle, GCC/Clang, CMake, make
+      # уже предустановлены на ubuntu-latest
+      # Если понадобится что-то ещё (Go, Rust, .NET) -- эти рантаймы
+      # тоже есть на образе "по умолчанию", см. actions/runner-images.
+
+      - name: Determine changed lab folders
+        id: changed
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD -- reports/)
+          # reports/<Фамилия>/<Лаба>/... -> reports/<Фамилия>/<Лаба>, без дублей
+          LAB_DIRS=$(echo "$CHANGED_FILES" | awk -F/ 'NF>=3 {print $1"/"$2"/"$3}' | sort -u | tr '\n' ' ')
+          echo "dirs=$LAB_DIRS" >> "$GITHUB_OUTPUT"
+          echo "Изменённые лабы: $LAB_DIRS"
+
+      - name: Run tests
+        run: |
+          chmod +x scripts/run_lab_tests.sh
+          ./scripts/run_lab_tests.sh ${{ steps.changed.outputs.dirs }} >> "$GITHUB_STEP_SUMMARY"
