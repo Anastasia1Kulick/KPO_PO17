@@ -1,6 +1,8 @@
 # Репозиторий для отчётов и проектов по лабораторным работам
 
-Репозиторий для отчётов и программ/проектов по лабораторному практикуму курса.
+ссылка на электронную очередь: https://docs.google.com/spreadsheets/d/1FFfxMHh_qEtyVldmp9tDRgwITp5Y6SA4VW2Xh6iDvrs/edit?usp=sharing
+
+ссылка на электронную ведомость: https://docs.google.com/spreadsheets/d/1esBjBMWBkn2GBHyKEAzKP-CuAJUphPBEWrAmjG0f6pg/edit?usp=sharing
 
 ## Порядок работы
 
