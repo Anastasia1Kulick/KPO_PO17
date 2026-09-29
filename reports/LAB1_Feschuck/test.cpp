@@ -1,97 +1,152 @@
-#include <cassert>
 #include <cstring>
 #include <iostream>
 #include "../src/game.h"
+using namespace std;
+struct TestReport {
+    int passed;
+    int failed;
+    TestReport() : passed(0), failed(0) {}
+};
+void check(bool condition, const char* message, TestReport &report) {
+    if (condition) {
+        cout << "  [OK]   " << message << "\n";
+        report.passed++;
+    } else {
+        cout << "  [FAIL] " << message << "\n";
+        report.failed++;
+    }
+}
 
-static bool contains(const char* haystack, const char* needle) {
+bool contains(const char* haystack, const char* needle) {
     return haystack != nullptr && needle != nullptr &&
-           std::strstr(haystack, needle) != nullptr;
+           strstr(haystack, needle) != nullptr;
 }
 
-// Тест 1
-static void test_defaultSettings() {
+// ТЕСТ 1
+void test_defaultSettings(TestReport &report) {
+    cout << "\nТест 1: значения по умолчанию\n";
+
     GameSettings s;
-    assert(s.citySize   == 10);
-    assert(s.budget     == 1000);
-    assert(s.population == 100);
-    std::cout << "  [OK] Тест 1: значения по умолчанию\n";
+    check(s.citySize   == 10,   "размер города по умолчанию = 10",   report);
+    check(s.budget     == 1000, "бюджет по умолчанию = 1000",        report);
+    check(s.population == 100,  "жителей по умолчанию = 100",        report);
+
+    check(s.citySize == 999,    "ОШИБКА-ТЕСТ: 10 == 999 (ожидается FAIL)", report);
 }
 
-// Тест 2
-static void test_switchCitySize() {
+// ТЕСТ 2
+void test_switchCitySize(TestReport &report) {
+    cout << "\nТест 2: размер города 10 -> 20 -> 30 -> 10\n";
+
     int size = 10;
-    switchCitySize(size); assert(size == 20);
-    switchCitySize(size); assert(size == 30);
-    switchCitySize(size); assert(size == 10);
-    std::cout << "  [OK] Тест 2: размер города 10->20->30->10\n";
+    switchCitySize(size);
+    check(size == 20, "после 1-го переключения size == 20", report);
+    switchCitySize(size);
+    check(size == 30, "после 2-го переключения size == 30", report);
+    switchCitySize(size);
+    check(size == 10, "после 3-го переключения size == 10", report);
+
+    switchCitySize(size);
+    check(size == 20, "после 4-го переключения size == 20", report);
 }
 
-// Тест 3
-static void test_switchBudget() {
+// ТЕСТ 3
+void test_switchBudget(TestReport &report) {
+    cout << "\nТест 3: бюджет 1000 -> 5000 -> 10000 -> 1000\n";
+
     int budget = 1000;
-    switchBudget(budget); assert(budget == 5000);
-    switchBudget(budget); assert(budget == 10000);
-    switchBudget(budget); assert(budget == 1000);
-    std::cout << "  [OK] Тест 3: бюджет 1000->5000->10000->1000\n";
+    switchBudget(budget);
+    check(budget == 5000,  "после 1-го переключения budget == 5000",  report);
+    switchBudget(budget);
+    check(budget == 10000, "после 2-го переключения budget == 10000", report);
+    switchBudget(budget);
+    check(budget == 1000,  "после 3-го переключения budget == 1000",  report);
 }
 
-// Тест 4
-static void test_switchPopulation() {
+// ТЕСТ 4
+void test_switchPopulation(TestReport &report) {
+    cout << "\nТест 4: жители 100 -> 500 -> 1000 -> 100\n";
+
     int pop = 100;
-    switchPopulation(pop); assert(pop == 500);
-    switchPopulation(pop); assert(pop == 1000);
-    switchPopulation(pop); assert(pop == 100);
-    std::cout << "  [OK] Тест 4: жители 100->500->1000->100\n";
+    switchPopulation(pop);
+    check(pop == 500,  "после 1-го переключения population == 500",  report);
+    switchPopulation(pop);
+    check(pop == 1000, "после 2-го переключения population == 1000", report);
+    switchPopulation(pop);
+    check(pop == 100,  "после 3-го переключения population == 100",  report);
 }
 
-// Тест 5
-static void test_playlistRecommendation() {
+// ТЕСТ 5
+void test_playlistRecommendation(TestReport &report) {
+    cout << "\nТест 5: рекомендация плейлиста\n";
+
     const char* rec = getPlaylistRecommendation();
-    assert(rec != nullptr);
-    assert(contains(rec, "City Builder"));
-    assert(contains(rec, "SimCity"));
-    assert(contains(rec, "Lo-Fi"));
-    assert(contains(rec, "Minecraft"));
-    std::cout << "  [OK] Тест 5: рекомендация плейлиста\n";
+    check(rec != nullptr,                "строка рекомендации не пустая",      report);
+    check(contains(rec, "City Builder"), "содержит 'City Builder'",            report);
+    check(contains(rec, "SimCity"),      "содержит 'SimCity'",                 report);
+    check(contains(rec, "Lo-Fi"),        "содержит 'Lo-Fi'",                   report);
+    check(contains(rec, "Minecraft"),    "содержит 'Minecraft'",               report);
+
+    check(!contains(rec, "Rap"),         "не содержит 'Rap'",                  report);
+    check(!contains(rec, "Metal"),       "не содержит 'Metal'",                report);
 }
 
-// Тест 6
-static void test_settingsAreSaved() {
+// ТЕСТ 6
+void test_settingsAreSaved(TestReport &report) {
+    cout << "\nТест 6: настройки сохраняются\n";
+
     GameSettings s;
     switchCitySize(s.citySize);
     switchBudget(s.budget);
     switchPopulation(s.population);
-    assert(s.citySize   == 20);
-    assert(s.budget     == 5000);
-    assert(s.population == 500);
-    std::cout << "  [OK] Тест 6: настройки сохраняются\n";
+
+    check(s.citySize   == 20,   "размер города сохранился = 20",   report);
+    check(s.budget     == 5000, "бюджет сохранился = 5000",        report);
+    check(s.population == 500,  "жителей сохранилось = 500",       report);
 }
 
-//  Тест 7
-static void test_fullCycle() {
+// ТЕСТ 7
+void test_fullCycle(TestReport &report) {
+    cout << "\nТест 7: полный цикл переключений\n";
+
     int size = 10, budget = 1000, pop = 100;
     for (int i = 0; i < 3; ++i) {
         switchCitySize(size);
         switchBudget(budget);
         switchPopulation(pop);
     }
-    assert(size == 10);
-    assert(budget == 1000);
-    assert(pop == 100);
-    std::cout << "  [OK] Тест 7: полный цикл возвращает исходные значения\n";
+    check(size   == 10,   "после 3 циклов size == 10",   report);
+    check(budget == 1000, "после 3 циклов budget == 1000", report);
+    check(pop    == 100,  "после 3 циклов pop == 100",   report);
 }
 
 int main() {
-    std::cout << "=== Запуск C++-юнит-тестов ===\n";
+    cout << "=====================================\n";
+    cout << "  Запуск C++-юнит-тестов\n";
+    cout << "=====================================\n";
 
-    test_defaultSettings();
-    test_switchCitySize();
-    test_switchBudget();
-    test_switchPopulation();
-    test_playlistRecommendation();
-    test_settingsAreSaved();
-    test_fullCycle();
+    TestReport report;
 
-    std::cout << "=== Все C++-тесты пройдены ===\n";
-    return 0;
+    test_defaultSettings(report);
+    test_switchCitySize(report);
+    test_switchBudget(report);
+    test_switchPopulation(report);
+    test_playlistRecommendation(report);
+    test_settingsAreSaved(report);
+    test_fullCycle(report);
+
+    cout << "\n=====================================\n";
+    cout << "  ИТОГИ\n";
+    cout << "=====================================\n";
+    cout << "  Пройдено: " << report.passed << "\n";
+    cout << "  Провалено: " << report.failed << "\n";
+    cout << "=====================================\n";
+
+    if (report.failed == 0) {
+        cout << "  ВСЕ ТЕСТЫ ПРОЙДЕНЫ\n";
+        return 0;
+    } else {
+        cout << "  ЕСТЬ ПРОВАЛЕННЫЕ ТЕСТЫ\n";
+        return 1;
+    }
 }
