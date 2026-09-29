@@ -138,7 +138,7 @@ void showAbout() {
     cout << "  • «City Builder OST» — спокойный эмбиент\n";
     cout << "  • «SimCity Soundtrack» — классика градостроения\n";
     cout << "  • «Lo-Fi City Beats» — ненавязчивый фон для игры\n";
-    cout << "  • «Max Korzh Playlist»\n";
+    cout << "  • «Minecraft playlist»\n";
     cout << "Приятной игры под хорошую музыку!\n";
     waitForEnter();
 }
