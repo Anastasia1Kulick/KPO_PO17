@@ -1,6 +1,6 @@
 #define main lab1_disabled_main
 
-#include "C:\Users\Ïëàòîâ\ÊÏÎ\Lab1.cpp"
+#include "Lab1.cpp"
 
 #undef main
 
@@ -105,7 +105,7 @@ void test_cycle_logic()
 int main()
 {
     setlocale(LC_ALL, "ru");
-    cout << "===== ÇÀÏÓÑÊ ÒÅÑÒÎÂ Lab1 =====" << endl;
+    cout << "===== Ã‡Ã€ÃÃ“Ã‘ÃŠ Ã’Ã…Ã‘Ã’ÃÃ‚ Lab1 =====" << endl;
     test_start_game_enum();
     test_load_game_enum();
     test_about_enum();
@@ -114,6 +114,6 @@ int main()
     test_settings_menu_enum();
     test_settings_mutation();
     test_cycle_logic();
-    cout << "===== ÂÑÅ ÒÅÑÒÛ ÏĞÎÉÄÅÍÛ =====";
+    cout << "===== Ã‚Ã‘Ã… Ã’Ã…Ã‘Ã’Ã› ÃÃÃÃ‰Ã„Ã…ÃÃ› =====";
     return 0;
 }
