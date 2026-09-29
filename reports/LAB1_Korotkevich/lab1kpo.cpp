@@ -19,35 +19,35 @@ int readInt() {
     while (!(cin >> value)) {
         cin.clear();
         cin.ignore(10000, '\n');
-        cout << "Îøèáêà ââîäà. Ïîâòîðèòå: ";
+        cout << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð²Ð²Ð¾Ð´Ð°. ÐŸÐ¾Ð²Ñ‚Ð¾Ñ€Ð¸Ñ‚Ðµ: ";
     }
     return value;
 }
 
 void pause() {
-    cout << "\nÍàæìèòå Enter...";
+    cout << "\nÐÐ°Ð¶Ð¼Ð¸Ñ‚Ðµ Enter...";
     cin.ignore(10000, '\n');
     cin.get();
 }
 
 void startGame() {
-    cout << "\nÈãðà íà÷àëàñü!\n";
+    cout << "\nÐ˜Ð³Ñ€Ð° Ð½Ð°Ñ‡Ð°Ð»Ð°ÑÑŒ!\n";
     pause();
 }
 
 void loadGame() {
-    cout << "\nÇàãðóçêà ïîêà íåäîñòóïíà.\n";
+    cout << "\nÐ—Ð°Ð³Ñ€ÑƒÐ·ÐºÐ° Ð¿Ð¾ÐºÐ° Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð°.\n";
     pause();
 }
 
 void showSettings(Settings& s) {
     while (true) {
-        cout << "\n--- Íàñòðîéêè ---\n";
-        cout << "1. Ðàçìåð ãîðîäà: " << s.citySize << "\n";
-        cout << "2. Íà÷àëüíûé áþäæåò: " << s.budget << "\n";
-        cout << "3. Êîëè÷åñòâî æèòåëåé: " << s.citizens << "\n";
-        cout << "0. Íàçàä\n";
-        cout << "Âûáîð: ";
+        cout << "\n--- ÐÐ°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸ ---\n";
+        cout << "1. Ð Ð°Ð·Ð¼ÐµÑ€ Ð³Ð¾Ñ€Ð¾Ð´Ð°: " << s.citySize << "\n";
+        cout << "2. ÐÐ°Ñ‡Ð°Ð»ÑŒÐ½Ñ‹Ð¹ Ð±ÑŽÐ´Ð¶ÐµÑ‚: " << s.budget << "\n";
+        cout << "3. ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¶Ð¸Ñ‚ÐµÐ»ÐµÐ¹: " << s.citizens << "\n";
+        cout << "0. ÐÐ°Ð·Ð°Ð´    \n";
+        cout << "Ð’Ñ‹Ð±Ð¾Ñ€: ";
 
         int choice = readInt();
 
@@ -59,13 +59,13 @@ void showSettings(Settings& s) {
             else s.budget = 1000;
         }
         else if (choice == 3) { s.citizens += 100; if (s.citizens > 500) s.citizens = 100; }
-        else cout << "Íåò òàêîãî ïóíêòà.\n";
+        else cout << "ÐÐµÑ‚ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð¿ÑƒÐ½ÐºÑ‚Ð°.\n";
     }
 }
 
 void showAbout() {
-    cout << "\nÂåðñèÿ ïðîãðàììû: 1.0\n";
-    cout << "Ñòóäåíò: Êîðîòêåâè÷ Ãëåá\n";
+    cout << "\nÐ’ÐµÑ€ÑÐ¸Ñ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹: 1.0\n";
+    cout << "Ð¡Ñ‚ÑƒÐ´ÐµÐ½Ñ‚: ÐšÐ¾Ñ€Ð¾Ñ‚ÐºÐµÐ²Ð¸Ñ‡ Ð“Ð»ÐµÐ±\n";
     pause();
 }
 
@@ -76,13 +76,13 @@ int main() {
     Settings settings;
 
     while (true) {
-        cout << "\n=== Ãîðîä ìå÷òû ===\n";
-        cout << MENU_START << ". Íà÷àòü èãðó\n";
-        cout << MENU_LOAD << ". Çàãðóçèòü èãðó\n";
-        cout << MENU_SETTINGS << ". Íàñòðîéêè\n";
-        cout << MENU_ABOUT << ". Î ïðîãðàììå\n";
-        cout << MENU_EXIT << ". Âûõîä\n";
-        cout << "Âûáîð: ";
+        cout << "\n=== Ð“Ð¾Ñ€Ð¾Ð´ Ð¼ÐµÑ‡Ñ‚Ñ‹ ===\n";
+        cout << MENU_START << ". ÐÐ°Ñ‡Ð°Ñ‚ÑŒ Ð¸Ð³Ñ€Ñƒ\n";
+        cout << MENU_LOAD << ". Ð—Ð°Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ Ð¸Ð³Ñ€Ñƒ\n";
+        cout << MENU_SETTINGS << ". ÐÐ°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸\n";
+        cout << MENU_ABOUT << ". Ðž Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ðµ\n";
+        cout << MENU_EXIT << ". Ð’Ñ‹Ñ…Ð¾Ð´\n";
+        cout << "Ð’Ñ‹Ð±Ð¾Ñ€: ";
 
         int choice = readInt();
 
@@ -91,7 +91,7 @@ int main() {
         else if (choice == MENU_SETTINGS) showSettings(settings);
         else if (choice == MENU_ABOUT) showAbout();
         else if (choice == MENU_EXIT) break;
-        else cout << "Íåò òàêîãî ïóíêòà.\n";
+        else cout << "ÐÐµÑ‚ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð¿ÑƒÐ½ÐºÑ‚Ð°.\n";
     }
     return 0;
 }
