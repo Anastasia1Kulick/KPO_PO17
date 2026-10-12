@@ -70,7 +70,6 @@ void test_infoGame() {
 
 void test_settingGame_change_name() {
     SETTING set;
-    // Нажатия: 2 (выбрать имя) -> Анна -> Enter -> 4 (выход)
     redirectStart("2\nАнна\n\n4\n");
     settingGame(set);
     redirectStop();
@@ -80,7 +79,6 @@ void test_settingGame_change_name() {
 
 void test_settingGame_change_specialty() {
     SETTING set;
-    // Нажатия: 1 (выбрать спец.) -> Искусственный интеллект -> Enter -> 4 (выход)
     redirectStart("1\nИскусственный интеллект\n\n4\n");
     settingGame(set);
     redirectStop();
@@ -90,7 +88,6 @@ void test_settingGame_change_specialty() {
 
 void test_settingGame_change_subjects() {
     SETTING set;
-    // Нажатия: 3 (выбрать предметы) -> 8 -> Enter -> 4 (выход)
     redirectStart("3\n8\n\n4\n");
     settingGame(set);
     redirectStop();
