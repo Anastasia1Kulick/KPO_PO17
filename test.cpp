@@ -1,17 +1,11 @@
-﻿// test.cpp
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <cstdio>
 #include <cstdlib>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
-static std::string exeName = "./1lab";
+static std::string exeName = "./lab2";
 
 static std::string runWithInput(const std::string& input) {
     std::string tmpIn = "test_input.tmp";
@@ -42,47 +36,68 @@ static void check(bool cond, const std::string& name) {
     if (cond) {
         std::cout << "[PASS] " << name << "\n";
         passed++;
-    }
-    else {
+    } else {
         std::cout << "[FAIL] " << name << "\n";
         failed++;
     }
+}
+
+static void removeOptions() {
+    std::remove("options.txt");
 }
 
 int main(int argc, char** argv) {
     if (argc > 1) exeName = argv[1];
 
     {
+        removeOptions();
         std::string out = runWithInput("5\n");
         check(contains(out, "1. Начать игру") &&
-            contains(out, "2. Загрузить игру") &&
-            contains(out, "3. Настройки") &&
-            contains(out, "4. О программе") &&
-            contains(out, "5. Выход"),
-            "test1_menu_display");
+              contains(out, "2. Загрузить игру") &&
+              contains(out, "3. Настройки") &&
+              contains(out, "4. О программе") &&
+              contains(out, "5. Выход"),
+              "test1_menu_display");
+        std::ifstream f("options.txt");
+        std::string content((std::istreambuf_iterator<char>(f)),
+                             std::istreambuf_iterator<char>());
+        f.close();
+        check(contains(content, "10") && contains(content, "50") &&
+              contains(content, "Легкая"),
+              "test1_options_default_created");
     }
 
     {
+        removeOptions();
         std::string out = runWithInput("4\n\n5\n");
         check(contains(out, "Версия игры 0.1") &&
-            contains(out, "Бородин Кирилл"),
-            "test2_about");
+              contains(out, "Бородин Кирилл"),
+              "test2_about");
     }
 
     {
-        std::string out = runWithInput("3\n2\n5\n");
+        removeOptions();
+        std::string out = runWithInput("3\n3\n5\n");
         check(contains(out, "Здоровье: 10") &&
-            contains(out, "Маленькое") &&
-            contains(out, "Легко"),
-            "test3_settings_defaults");
+              contains(out, "Маленькое") &&
+              contains(out, "Легкая"),
+              "test3_settings_defaults");
     }
 
     {
-        std::string out = runWithInput("3\n1\n7\n2\n3\n2\n5\n");
+        removeOptions();
+        std::string out = runWithInput("3\n1\n7\n2\n3\n3\n5\n");
         check(contains(out, "Здоровье: 7") &&
-            contains(out, "Среднее") &&
-            contains(out, "Тяжело"),
-            "test4_settings_change");
+              contains(out, "Среднее") &&
+              contains(out, "Тяжело"),
+              "test4_settings_change");
+        std::ifstream f("options.txt");
+        std::string content((std::istreambuf_iterator<char>(f)),
+                             std::istreambuf_iterator<char>());
+        f.close();
+        check(contains(content, "7") && contains(content, "100") &&
+              contains(content, "Тяжело"),
+              "test4_options_saved");
     }
 
     std::cout << "\nPassed: " << passed << ", Failed: " << failed << "\n";
