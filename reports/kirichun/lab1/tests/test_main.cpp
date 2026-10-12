@@ -3,7 +3,6 @@
 #include <sstream>
 #include <cassert>
 
-// Подключаем твой основной файл, временно переименовав main()
 #define main original_main
 #include "../src/main.cpp"
 #undef main
@@ -15,7 +14,6 @@ static ostringstream g_out;
 static streambuf* g_oldCin = nullptr;
 static streambuf* g_oldCout = nullptr;
 
-// Перенаправление ввода/вывода для имитации клавиатуры и перехвата экрана
 void redirectStart(const string& input) {
     g_in.str(input);
     g_in.clear();
@@ -34,7 +32,6 @@ string redirectOutput() {
     return g_out.str();
 }
 
-// 1. Тест начальных значений структуры настроек
 void test_default_settings() {
     SETTING set;
     assert(set.specialty == "Программная инженерия");
@@ -43,7 +40,6 @@ void test_default_settings() {
     cout << "test_default_settings passed\n";
 }
 
-// 2. Тест функции startGame
 void test_startGame() {
     redirectStart("\n");
     startGame();
@@ -53,7 +49,6 @@ void test_startGame() {
     cout << "test_startGame passed\n";
 }
 
-// 3. Тест функции loadGame
 void test_loadGame() {
     redirectStart("\n");
     loadGame();
@@ -63,7 +58,6 @@ void test_loadGame() {
     cout << "test_loadGame passed\n";
 }
 
-// 4. Тест функции infoGame
 void test_infoGame() {
     redirectStart("\n");
     infoGame();
@@ -74,7 +68,6 @@ void test_infoGame() {
     cout << "test_infoGame passed\n";
 }
 
-// 5. Тест изменения имени в меню настроек
 void test_settingGame_change_name() {
     SETTING set;
     // Нажатия: 2 (выбрать имя) -> Анна -> Enter -> 4 (выход)
@@ -85,7 +78,6 @@ void test_settingGame_change_name() {
     cout << "test_settingGame_change_name passed\n";
 }
 
-// 6. Тест изменения специальности в меню настроек
 void test_settingGame_change_specialty() {
     SETTING set;
     // Нажатия: 1 (выбрать спец.) -> Искусственный интеллект -> Enter -> 4 (выход)
@@ -96,7 +88,6 @@ void test_settingGame_change_specialty() {
     cout << "test_settingGame_change_specialty passed\n";
 }
 
-// 7. Тест изменения количества предметов
 void test_settingGame_change_subjects() {
     SETTING set;
     // Нажатия: 3 (выбрать предметы) -> 8 -> Enter -> 4 (выход)
