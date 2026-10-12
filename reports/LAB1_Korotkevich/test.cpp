@@ -15,7 +15,6 @@ void check(bool condition, const char* name) {
     }
 }
 
-// ===== Копия логики настроек из lab1kpo.cpp =====
 struct Settings {
     int citySize = 1;
     int budget = 1000;
@@ -37,7 +36,6 @@ void nextCitizens(Settings& s) {
     s.citizens += 100;
     if (s.citizens > 500) s.citizens = 100;
 }
-// ================================================
 
 void testDefaults() {
     Settings s;
