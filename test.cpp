@@ -1,4 +1,4 @@
-// test.cpp
+п»ї// test.cpp
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -54,34 +54,34 @@ int main(int argc, char** argv) {
 
     {
         std::string out = runWithInput("5\n");
-        check(contains(out, "1. Начать игру") &&
-            contains(out, "2. Загрузить игру") &&
-            contains(out, "3. Настройки") &&
-            contains(out, "4. О программе") &&
-            contains(out, "5. Выход"),
+        check(contains(out, "1. РќР°С‡Р°С‚СЊ РёРіСЂСѓ") &&
+            contains(out, "2. Р—Р°РіСЂСѓР·РёС‚СЊ РёРіСЂСѓ") &&
+            contains(out, "3. РќР°СЃС‚СЂРѕР№РєРё") &&
+            contains(out, "4. Рћ РїСЂРѕРіСЂР°РјРјРµ") &&
+            contains(out, "5. Р’С‹С…РѕРґ"),
             "test1_menu_display");
     }
 
     {
         std::string out = runWithInput("4\n\n5\n");
-        check(contains(out, "Версия игры 0.1") &&
-            contains(out, "Бородин Кирилл"),
+        check(contains(out, "Р’РµСЂСЃРёСЏ РёРіСЂС‹ 0.1") &&
+            contains(out, "Р‘РѕСЂРѕРґРёРЅ РљРёСЂРёР»Р»"),
             "test2_about");
     }
 
     {
         std::string out = runWithInput("3\n2\n5\n");
-        check(contains(out, "Здоровье: 10") &&
-            contains(out, "Маленькое") &&
-            contains(out, "Легко"),
+        check(contains(out, "Р—РґРѕСЂРѕРІСЊРµ: 10") &&
+            contains(out, "РњР°Р»РµРЅСЊРєРѕРµ") &&
+            contains(out, "Р›РµРіРєРѕ"),
             "test3_settings_defaults");
     }
 
     {
         std::string out = runWithInput("3\n1\n7\n2\n3\n2\n5\n");
-        check(contains(out, "Здоровье: 7") &&
-            contains(out, "Среднее") &&
-            contains(out, "Тяжело"),
+        check(contains(out, "Р—РґРѕСЂРѕРІСЊРµ: 7") &&
+            contains(out, "РЎСЂРµРґРЅРµРµ") &&
+            contains(out, "РўСЏР¶РµР»Рѕ"),
             "test4_settings_change");
     }
 
