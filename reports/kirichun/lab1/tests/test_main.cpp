@@ -1,3 +1,7 @@
+#define main original_main
+#include "../src/main.cpp"
+#undef main
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -20,10 +24,6 @@ void loadGame();
 void settingGame(SETTING& set);
 void infoGame();
 void exitGame();
-
-#define main original_main
-#include "../src/main.cpp"
-#undef main
 
 using namespace std;
 
