@@ -64,8 +64,15 @@ void showSettings(Settings& s) {
 }
 
 void showAbout() {
+    cout << "\n=== О программе ===\n";
     cout << "\nВерсия программы: 1.0\n";
     cout << "Студент: Короткевич Глеб\n";
+    cout << "\nСаундтреки, использованные в игре:\n";
+    cout << "1. Main Theme - A. Composer\n";
+    cout << "2. Dangeon Ambience - B. Composer\n";
+    cout << "3. Battke Theme - C. Composer\n";
+    cout << "4. Victory Fanfare - D. Composer\n";
+    cout << "5. Game Over - E. Composer\n";
     pause();
 }
 
