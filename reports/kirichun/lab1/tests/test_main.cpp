@@ -3,6 +3,18 @@
 #include <sstream>
 #include <cassert>
 
+struct SETTING {
+    std::string specialty = "Программная инженерия";
+    std::string studentName = "Аня";
+    int subjectCount = 11;
+};
+
+void startGame();
+void loadGame();
+void settingGame(SETTING& set);
+void infoGame();
+void exitGame();
+
 #define main original_main
 #include "../src/main.cpp"
 #undef main
