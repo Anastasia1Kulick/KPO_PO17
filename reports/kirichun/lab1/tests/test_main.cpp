@@ -3,6 +3,12 @@
 #include <sstream>
 #include <cassert>
 
+#ifndef _WIN32
+inline void SetConsoleCP(unsigned int) {}
+inline void SetConsoleOutputCP(unsigned int) {}
+#define system(cmd)
+#endif
+
 struct SETTING {
     std::string specialty = "Программная инженерия";
     std::string studentName = "Аня";
