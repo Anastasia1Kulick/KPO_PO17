@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -28,6 +28,14 @@ public:
         availableBuildings.push_back(Building("Магазин", 1000, 300, 10));
         availableBuildings.push_back(Building("Фабрика", 2500, 800, 20));
         availableBuildings.push_back(Building("Парк", 1500, 100, 100));
+        ifstream f("custom_buildings.txt");
+        if (f) {
+            string n;
+            int c, inc, cit;
+            while (f >> n >> c >> inc >> cit) {
+                availableBuildings.push_back(Building(n, c, inc, cit));
+            }
+        }
     }
 };
 class Mayor {
@@ -191,12 +199,33 @@ void startGame(Settings& s) {
     pause();
 }
 void loadGame() { cout << "\nЗагрузка пока недоступна.\n"; pause(); }
+void createCustomBuilding() {
+    cout << "\n--- Создание своего здания ---\n";
+    cout << "Введите название (без пробелов): ";
+    string name;
+    cin >> name;
+    cout << "Введите цену постройки: ";
+    int cost = readInt();
+    cout << "Введите доход от здания за неделю: ";
+    int income = readInt();
+    cout << "Введите бонус к жителям: ";
+    int cit = readInt();
+    ofstream f("custom_buildings.txt", ios::app);
+    if (f) {
+        f << name << " " << cost << " " << income << " " << cit << "\n";
+        cout << "Здание успешно добавлено в игру!\n";
+    }
+    else {
+        cout << "Ошибка при сохранении здания.\n";
+    }
+}
 void showSettings(Settings& s, const vector<int>& cv, const vector<int>& bv, const vector<int>& civ) {
     while (true) {
         cout << "\n--- Настройки ---\n";
         cout << "1. Размер города: " << s.citySize << "\n";
         cout << "2. Начальный бюджет: " << s.budget << "\n";
         cout << "3. Количество жителей: " << s.citizens << "\n";
+        cout << "4. Создать свое здание\n";
         cout << "0. Назад\n";
         cout << "Выбор: ";
         int choice = readInt();
@@ -208,13 +237,14 @@ void showSettings(Settings& s, const vector<int>& cv, const vector<int>& bv, con
         if (choice == 1) nextCitySize(s, cv);
         else if (choice == 2) nextBudget(s, bv);
         else if (choice == 3) nextCitizens(s, civ);
+        else if (choice == 4) createCustomBuilding();
         else cout << "Нет такого пункта.\n";
     }
 }
 void showAbout() {
     cout << "\n=== О программе ===\n";
     cout << "Версия программы: 3.0\n";
-    cout << "Студент: Короткевич Глеб\n";
+    cout << "Студент: Иванов Иван\n";
     cout << "\nСаундтреки:\n";
     cout << "1. Городская суета - Main Theme\n";
     cout << "2. Стройка века - Building Theme\n";
