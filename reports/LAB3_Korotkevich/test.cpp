@@ -20,7 +20,7 @@ public:
     int size, budget, citizens;
     vector<Building> availableBuildings;
     Town(int s, int b, int c) : size(s), budget(b), citizens(c) {
-        availableBuildings.push_back(Building("����� ���", 500, 0, 50));
+        availableBuildings.push_back(Building("Жилой дом", 500, 0, 50));
     }
 };
 class Mayor {
@@ -67,6 +67,13 @@ int main() {
         bool fail = mayor.build(town, 0);
         check(!fail, "not enough budget fails");
         check(town.budget == 100, "budget not changed on fail");
+    }
+    {
+        Building custom("МойДом", 800, 200, 30);
+        check(custom.name == "МойДом", "custom building name");
+        check(custom.cost == 800, "custom building cost");
+        check(custom.incomeBonus == 200, "custom building income");
+        check(custom.citizensBonus == 30, "custom building citizens bonus");
     }
     cout << "\n=== Result ===\n";
     cout << "Passed: " << passed << "\n";
