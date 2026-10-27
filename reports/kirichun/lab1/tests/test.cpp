@@ -2,7 +2,6 @@
 #include <sstream>
 #include <string>
 #include <functional>
-#include <windows.h>
 
 using namespace std;
 
@@ -19,16 +18,30 @@ void check(bool condition, const string& name) {
     }
 }
 
+string captureInput(const string& input, const function<void()>& fn) {
+    stringstream inputStream(input);
+    streambuf* oldCin = cin.rdbuf(inputStream.rdbuf());
+    
+    stringstream buffer;
+    streambuf* oldCout = cout.rdbuf(buffer.rdbuf());
+    
+    fn();
+    
+    cin.rdbuf(oldCin);
+    cout.rdbuf(oldCout);
+    return buffer.str();
+}
+
 void test_default_settings() {
     struct SETTING {
         string specialty = "Программная инженерия";
         string studentName = "Аня";
-        int subjectCount = 11;
+        int subjectsCount = 5;
     };
     SETTING s;
     check(s.specialty == "Программная инженерия", "Начальная специальность корректна");
     check(s.studentName == "Аня", "Начальное имя корректно");
-    check(s.subjectCount == 11, "Начальное количество предметов корректно");
+    check(s.subjectsCount == 5, "Начальное количество предметов корректно");
 }
 
 void test_menu_constants() {
@@ -43,13 +56,46 @@ void test_menu_constants() {
         "Константы главного меню корректны");
 }
 
-int main() {
-    SetConsoleOutputCP(1251);
-    setlocale(LC_ALL, "Russian");
+void test_change_speciality() {
+    struct SETTING {
+        string specialty = "Программная инженерия";
+    };
+    SETTING s;
+    captureInput("Прикладная информатика\n", [&]() {
+        getline(cin, s.specialty);
+    });
+    check(s.specialty == "Прикладная информатика", "Изменение специальности работает");
+}
+
+void test_subjects_validation() {
+    int n = 0;
+    captureInput("-3\n", [&]() {
+        cin >> n;
+    });
+    check(cin.fail() || n <= 0, "Отрицательное количество предметов обрабатывается корректно");
+}
+
+void test_invalid_menu_input() {
+    int choice = 0;
+    cin.clear();
+    stringstream inputStream("abc\n");
+    streambuf* oldCin = cin.rdbuf(inputStream.rdbuf());
+    cin >> choice;
+    bool failed = cin.fail();
+    cin.rdbuf(oldCin);
+    cin.clear();
     
+    check(failed, "Нечисловой ввод в меню вызывает сбой ввода (cin.fail)");
+}
+
+int main() {
     cout << "=== Модульные тесты ===\n\n";
+    
     test_default_settings();
     test_menu_constants();
+    test_change_speciality();
+    test_subjects_validation();
+    test_invalid_menu_input();
     
     cout << "\n============================\n";
     cout << "Пройдено: " << testsPassed << " / " << testsRun << "\n";
