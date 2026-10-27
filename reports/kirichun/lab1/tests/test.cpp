@@ -1,162 +1,134 @@
 #include <iostream>
 #include <string>
-#include <sstream>
-#include <cassert>
 #include <vector>
-#include <functional>
 
 using namespace std;
 
-const int Start = 1;
-const int Load = 2;
-const int Setting = 3;
-const int Info = 4;
-const int Exit = 5;
+const string DEFAULT_SPECIALTY = "Программная инженерия";
+const string DEFAULT_NAME = "Аня";
+const int DEFAULT_SUBJECT_COUNT = 11;
 
-const int Specialty = 1;
-const int Name = 2;
-const int Subjects = 3;
-const int Back = 4;
+struct GameSettings {
+    string specialty = DEFAULT_SPECIALTY;
+    string studentName = DEFAULT_NAME;
+    int subjectCount = DEFAULT_SUBJECT_COUNT;
 
-struct SETTING {
-    string specialty = "Программная инженерия";
-    string studentName = "Аня";
-    int subjectCount = 11;
+    void reset() {
+        specialty = DEFAULT_SPECIALTY;
+        studentName = DEFAULT_NAME;
+        subjectCount = DEFAULT_SUBJECT_COUNT;
+    }
+
+    void setSpecialty(const string& spec) {
+        specialty = spec;
+    }
+
+    void setName(const string& name) {
+        studentName = name;
+    }
+
+    bool setSubjectCount(int count) {
+        if (count < 0) return false;
+        subjectCount = count;
+        return true;
+    }
 };
 
-bool applySettingCommand(SETTING& set, int choice,
-                         const string& textValue, int intValue) {
-    switch (choice) {
-    case Specialty:
-        set.specialty = textValue;
-        return false;
-    case Name:
-        set.studentName = textValue;
-        return false;
-    case Subjects:
-        if (intValue < 0) return false;
-        set.subjectCount = intValue;
-        return false;
-    case Back:
-        return true;
-    default:
-        return false;
-    }
-}
+static int g_passed = 0;
+static int g_failed = 0;
+static vector<string> g_failures;
 
-int passed = 0;
-int failed = 0;
-
-void check(bool condition, const string& testName) {
-    if (condition) {
-        cout << "[PASS] " << testName << endl;
-        passed++;
+void check(bool cond, const string& name) {
+    if (cond) {
+        ++g_passed;
+        cout << "  [ OK ] " << name << "\n";
     } else {
-        cout << "[FAIL] " << testName << endl;
-        failed++;
+        ++g_failed;
+        g_failures.push_back(name);
+        cout << "  [FAIL] " << name << "\n";
     }
 }
 
-void testDefaultSettings() {
-    cout << "\n--- Тест: значения по умолчанию ---" << endl;
-    SETTING s;
-    check(s.specialty == "Программная инженерия", "Специальность по умолчанию");
-    check(s.studentName == "Аня", "Имя студента по умолчанию");
-    check(s.subjectCount == 11, "Количество предметов по умолчанию");
+template <typename T>
+void checkEq(const T& actual, const T& expected, const string& name) {
+    if (actual == expected) {
+        ++g_passed;
+        cout << "  [ OK ] " << name << "\n";
+    } else {
+        ++g_failed;
+        g_failures.push_back(name);
+        cout << "  [FAIL] " << name << " (получено: " << actual << ", ожидалось: " << expected << ")\n";
+    }
 }
 
-void testConstants() {
-    cout << "\n--- Тест: константы меню ---" << endl;
-    check(Start == 1, "Start == 1");
-    check(Load == 2, "Load == 2");
-    check(Setting == 3, "Setting == 3");
-    check(Info == 4, "Info == 4");
-    check(Exit == 5, "Exit == 5");
-
-    check(Specialty == 1, "Specialty == 1");
-    check(Name == 2, "Name == 2");
-    check(Subjects == 3, "Subjects == 3");
-    check(Back == 4, "Back == 4");
+void testDefaults() {
+    cout << "\n[1] Значения по умолчанию\n";
+    GameSettings s;
+    checkEq(s.specialty, DEFAULT_SPECIALTY, "специальность по умолчанию");
+    checkEq(s.studentName, DEFAULT_NAME, "имя студента по умолчанию");
+    checkEq(s.subjectCount, DEFAULT_SUBJECT_COUNT, "количество предметов по умолчанию");
 }
 
-void testChangeSpecialty() {
-    cout << "\n--- Тест: смена специальности ---" << endl;
-    SETTING s;
-    bool back = applySettingCommand(s, Specialty, "Искусственный интеллект", 0);
-    check(!back, "Возврат false при смене специальности");
-    check(s.specialty == "Искусственный интеллект", "Специальность изменилась");
+void testSetSpecialty() {
+    cout << "\n[2] Установка специальности\n";
+    GameSettings s;
+    s.setSpecialty("Искусственный интеллект");
+    checkEq(s.specialty, string("Искусственный интеллект"), "специальность изменена");
+    s.setSpecialty("");
+    checkEq(s.specialty, string(""), "можно установить пустую строку");
 }
 
-void testChangeName() {
-    cout << "\n--- Тест: смена имени ---" << endl;
-    SETTING s;
-    bool back = applySettingCommand(s, Name, "Иван", 0);
-    check(!back, "Возврат false при смене имени");
-    check(s.studentName == "Иван", "Имя изменилось");
+void testSetName() {
+    cout << "\n[3] Установка имени\n";
+    GameSettings s;
+    s.setName("Иван");
+    checkEq(s.studentName, string("Иван"), "имя изменено");
+    s.setName("Анна-Мария");
+    checkEq(s.studentName, string("Анна-Мария"), "имя с дефисом");
 }
 
-void testChangeSubjects() {
-    cout << "\n--- Тест: смена количества предметов ---" << endl;
-    SETTING s;
-    applySettingCommand(s, Subjects, "", 7);
-    check(s.subjectCount == 7, "Количество предметов изменилось на 7");
+void testSetSubjectCount() {
+    cout << "\n[4] Установка количества предметов\n";
+    GameSettings s;
+    check(s.setSubjectCount(5), "5 — принято");
+    checkEq(s.subjectCount, 5, "предметов = 5");
+    
+    check(s.setSubjectCount(0), "0 — принято");
+    checkEq(s.subjectCount, 0, "предметов = 0");
 
-    applySettingCommand(s, Subjects, "", 0);
-    check(s.subjectCount == 0, "Можно установить 0 предметов");
+    check(!s.setSubjectCount(-1), "-1 — отклонено");
+    checkEq(s.subjectCount, 0, "предметов осталось 0 после ошибки");
 }
 
-void testNegativeSubjects() {
-    cout << "\n--- Тест: отрицательное число предметов ---" << endl;
-    SETTING s;
-    int old = s.subjectCount;
-    applySettingCommand(s, Subjects, "", -5);
-    check(s.subjectCount == old, "Отрицательное значение не применяется");
-}
-
-void testBackCommand() {
-    cout << "\n--- Тест: команда 'Назад' ---" << endl;
-    SETTING s;
-    bool back = applySettingCommand(s, Back, "", 0);
-    check(back, "Возврат true при выборе 'Назад'");
-    check(s.specialty == "Программная инженерия", "Настройки не изменились");
-    check(s.studentName == "Аня", "Имя не изменилось");
-    check(s.subjectCount == 11, "Предметы не изменились");
-}
-
-void testInvalidCommand() {
-    cout << "\n--- Тест: неизвестная команда ---" << endl;
-    SETTING s;
-    bool back = applySettingCommand(s, 99, "", 0);
-    check(!back, "Возврат false для неизвестной команды");
-    check(s.specialty == "Программная инженерия", "Настройки не тронуты");
-}
-
-void testEmptySpecialty() {
-    cout << "\n--- Тест: пустая строка специальности ---" << endl;
-    SETTING s;
-    applySettingCommand(s, Specialty, "", 0);
-    check(s.specialty == "", "Можно установить пустую специальность");
+void testReset() {
+    cout << "\n[5] Сброс настроек\n";
+    GameSettings s;
+    s.specialty = "Другая";
+    s.studentName = "Петр";
+    s.subjectCount = 99;
+    s.reset();
+    
+    checkEq(s.specialty, DEFAULT_SPECIALTY, "специальность сброшена");
+    checkEq(s.studentName, DEFAULT_NAME, "имя сброшено");
+    checkEq(s.subjectCount, DEFAULT_SUBJECT_COUNT, "предметы сброшены");
 }
 
 int main() {
-    cout << "========================================" << endl;
-    cout << "   ЗАПУСК ТЕСТОВ test.cpp" << endl;
-    cout << "========================================" << endl;
+    cout << " Запуск тестов: МОЯ ЖИЗНЬ В УНИВЕРСИТЕТЕ\n";
+    
+    testDefaults();
+    testSetSpecialty();
+    testSetName();
+    testSetSubjectCount();
+    testReset();
 
-    testConstants();
-    testDefaultSettings();
-    testChangeSpecialty();
-    testChangeName();
-    testChangeSubjects();
-    testNegativeSubjects();
-    testBackCommand();
-    testInvalidCommand();
-    testEmptySpecialty();
-
-    cout << "\n========================================" << endl;
-    cout << "  РЕЗУЛЬТАТ: passed = " << passed
-         << ", failed = " << failed << endl;
-    cout << "========================================" << endl;
-
-    return (failed == 0) ? 0 : 1;
+    cout << "\n Итог: пройдено " << g_passed << ", провалено " << g_failed << "\n";
+    
+    if (g_failed > 0) {
+        cout << "\nПроваленные тесты:\n";
+        for (const auto& f : g_failures) cout << "  - " << f << "\n";
+        return 1;
+    }
+    cout << "\nВсе тесты пройдены успешно.\n";
+    return 0;
 }
