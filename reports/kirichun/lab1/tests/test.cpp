@@ -1,105 +1,162 @@
 #include <iostream>
-#include <sstream>
 #include <string>
+#include <sstream>
+#include <cassert>
+#include <vector>
 #include <functional>
 
 using namespace std;
 
-int testsRun = 0;
-int testsPassed = 0;
+const int Start = 1;
+const int Load = 2;
+const int Setting = 3;
+const int Info = 4;
+const int Exit = 5;
 
-void check(bool condition, const string& name) {
-    testsRun++;
-    if (condition) {
-        testsPassed++;
-        cout << "[OK]   " << name << "\n";
-    } else {
-        cout << "[FAIL] " << name << "\n";
+const int Specialty = 1;
+const int Name = 2;
+const int Subjects = 3;
+const int Back = 4;
+
+struct SETTING {
+    string specialty = "Программная инженерия";
+    string studentName = "Аня";
+    int subjectCount = 11;
+};
+
+bool applySettingCommand(SETTING& set, int choice,
+                         const string& textValue, int intValue) {
+    switch (choice) {
+    case Specialty:
+        set.specialty = textValue;
+        return false;
+    case Name:
+        set.studentName = textValue;
+        return false;
+    case Subjects:
+        if (intValue < 0) return false;
+        set.subjectCount = intValue;
+        return false;
+    case Back:
+        return true;
+    default:
+        return false;
     }
 }
 
-string captureInput(const string& input, const function<void()>& fn) {
-    stringstream inputStream(input);
-    streambuf* oldCin = cin.rdbuf(inputStream.rdbuf());
-    
-    stringstream buffer;
-    streambuf* oldCout = cout.rdbuf(buffer.rdbuf());
-    
-    fn();
-    
-    cin.rdbuf(oldCin);
-    cout.rdbuf(oldCout);
-    return buffer.str();
+int passed = 0;
+int failed = 0;
+
+void check(bool condition, const string& testName) {
+    if (condition) {
+        cout << "[PASS] " << testName << endl;
+        passed++;
+    } else {
+        cout << "[FAIL] " << testName << endl;
+        failed++;
+    }
 }
 
-void test_default_settings() {
-    struct SETTING {
-        string specialty = "Программная инженерия";
-        string studentName = "Аня";
-        int subjectsCount = 5;
-    };
+void testDefaultSettings() {
+    cout << "\n--- Тест: значения по умолчанию ---" << endl;
     SETTING s;
-    check(s.specialty == "Программная инженерия", "Начальная специальность корректна");
-    check(s.studentName == "Аня", "Начальное имя корректно");
-    check(s.subjectsCount == 5, "Начальное количество предметов корректно");
+    check(s.specialty == "Программная инженерия", "Специальность по умолчанию");
+    check(s.studentName == "Аня", "Имя студента по умолчанию");
+    check(s.subjectCount == 11, "Количество предметов по умолчанию");
 }
 
-void test_menu_constants() {
-    const int MENU_START = 1;
-    const int MENU_LOAD = 2;
-    const int MENU_SETTINGS = 3;
-    const int MENU_ABOUT = 4;
-    const int MENU_EXIT = 5;
+void testConstants() {
+    cout << "\n--- Тест: константы меню ---" << endl;
+    check(Start == 1, "Start == 1");
+    check(Load == 2, "Load == 2");
+    check(Setting == 3, "Setting == 3");
+    check(Info == 4, "Info == 4");
+    check(Exit == 5, "Exit == 5");
 
-    check(MENU_START == 1 && MENU_LOAD == 2 && MENU_SETTINGS == 3 
-        && MENU_ABOUT == 4 && MENU_EXIT == 5, 
-        "Константы главного меню корректны");
+    check(Specialty == 1, "Specialty == 1");
+    check(Name == 2, "Name == 2");
+    check(Subjects == 3, "Subjects == 3");
+    check(Back == 4, "Back == 4");
 }
 
-void test_change_speciality() {
-    struct SETTING {
-        string specialty = "Программная инженерия";
-    };
+void testChangeSpecialty() {
+    cout << "\n--- Тест: смена специальности ---" << endl;
     SETTING s;
-    captureInput("Прикладная информатика\n", [&]() {
-        getline(cin, s.specialty);
-    });
-    check(s.specialty == "Прикладная информатика", "Изменение специальности работает");
+    bool back = applySettingCommand(s, Specialty, "Искусственный интеллект", 0);
+    check(!back, "Возврат false при смене специальности");
+    check(s.specialty == "Искусственный интеллект", "Специальность изменилась");
 }
 
-void test_subjects_validation() {
-    int n = 0;
-    captureInput("-3\n", [&]() {
-        cin >> n;
-    });
-    check(cin.fail() || n <= 0, "Отрицательное количество предметов обрабатывается корректно");
+void testChangeName() {
+    cout << "\n--- Тест: смена имени ---" << endl;
+    SETTING s;
+    bool back = applySettingCommand(s, Name, "Иван", 0);
+    check(!back, "Возврат false при смене имени");
+    check(s.studentName == "Иван", "Имя изменилось");
 }
 
-void test_invalid_menu_input() {
-    int choice = 0;
-    cin.clear();
-    stringstream inputStream("abc\n");
-    streambuf* oldCin = cin.rdbuf(inputStream.rdbuf());
-    cin >> choice;
-    bool failed = cin.fail();
-    cin.rdbuf(oldCin);
-    cin.clear();
-    
-    check(failed, "Нечисловой ввод в меню вызывает сбой ввода (cin.fail)");
+void testChangeSubjects() {
+    cout << "\n--- Тест: смена количества предметов ---" << endl;
+    SETTING s;
+    applySettingCommand(s, Subjects, "", 7);
+    check(s.subjectCount == 7, "Количество предметов изменилось на 7");
+
+    applySettingCommand(s, Subjects, "", 0);
+    check(s.subjectCount == 0, "Можно установить 0 предметов");
+}
+
+void testNegativeSubjects() {
+    cout << "\n--- Тест: отрицательное число предметов ---" << endl;
+    SETTING s;
+    int old = s.subjectCount;
+    applySettingCommand(s, Subjects, "", -5);
+    check(s.subjectCount == old, "Отрицательное значение не применяется");
+}
+
+void testBackCommand() {
+    cout << "\n--- Тест: команда 'Назад' ---" << endl;
+    SETTING s;
+    bool back = applySettingCommand(s, Back, "", 0);
+    check(back, "Возврат true при выборе 'Назад'");
+    check(s.specialty == "Программная инженерия", "Настройки не изменились");
+    check(s.studentName == "Аня", "Имя не изменилось");
+    check(s.subjectCount == 11, "Предметы не изменились");
+}
+
+void testInvalidCommand() {
+    cout << "\n--- Тест: неизвестная команда ---" << endl;
+    SETTING s;
+    bool back = applySettingCommand(s, 99, "", 0);
+    check(!back, "Возврат false для неизвестной команды");
+    check(s.specialty == "Программная инженерия", "Настройки не тронуты");
+}
+
+void testEmptySpecialty() {
+    cout << "\n--- Тест: пустая строка специальности ---" << endl;
+    SETTING s;
+    applySettingCommand(s, Specialty, "", 0);
+    check(s.specialty == "", "Можно установить пустую специальность");
 }
 
 int main() {
-    cout << "=== Модульные тесты ===\n\n";
-    
-    test_default_settings();
-    test_menu_constants();
-    test_change_speciality();
-    test_subjects_validation();
-    test_invalid_menu_input();
-    
-    cout << "\n============================\n";
-    cout << "Пройдено: " << testsPassed << " / " << testsRun << "\n";
-    cout << "============================\n";
-    
-    return (testsPassed == testsRun) ? 0 : 1;
+    cout << "========================================" << endl;
+    cout << "   ЗАПУСК ТЕСТОВ test.cpp" << endl;
+    cout << "========================================" << endl;
+
+    testConstants();
+    testDefaultSettings();
+    testChangeSpecialty();
+    testChangeName();
+    testChangeSubjects();
+    testNegativeSubjects();
+    testBackCommand();
+    testInvalidCommand();
+    testEmptySpecialty();
+
+    cout << "\n========================================" << endl;
+    cout << "  РЕЗУЛЬТАТ: passed = " << passed
+         << ", failed = " << failed << endl;
+    cout << "========================================" << endl;
+
+    return (failed == 0) ? 0 : 1;
 }
