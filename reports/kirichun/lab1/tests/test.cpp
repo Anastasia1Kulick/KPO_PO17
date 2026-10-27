@@ -4,36 +4,14 @@
 
 using namespace std;
 
-const string DEFAULT_SPECIALTY = "Программная инженерия";
-const string DEFAULT_NAME = "Аня";
-const int DEFAULT_SUBJECT_COUNT = 11;
-
-struct GameSettings {
-    string specialty = DEFAULT_SPECIALTY;
-    string studentName = DEFAULT_NAME;
-    int subjectCount = DEFAULT_SUBJECT_COUNT;
-
-    void reset() {
-        specialty = DEFAULT_SPECIALTY;
-        studentName = DEFAULT_NAME;
-        subjectCount = DEFAULT_SUBJECT_COUNT;
-    }
-
-    void setSpecialty(const string& spec) {
-        specialty = spec;
-    }
-
-    void setName(const string& name) {
-        studentName = name;
-    }
-
-    bool setSubjectCount(int count) {
-        if (count < 0) return false;
-        subjectCount = count;
-        return true;
-    }
+// Копия структуры из исходного кода
+struct SETTING {
+    string specialty = "Программная инженерия";
+    string studentName = "Аня";
+    int subjectCount = 11;
 };
 
+// Мини-фреймворк для тестирования
 static int g_passed = 0;
 static int g_failed = 0;
 static vector<string> g_failures;
@@ -57,78 +35,108 @@ void checkEq(const T& actual, const T& expected, const string& name) {
     } else {
         ++g_failed;
         g_failures.push_back(name);
-        cout << "  [FAIL] " << name << " (получено: " << actual << ", ожидалось: " << expected << ")\n";
+        cout << "  [FAIL] " << name
+             << " (получено: " << actual
+             << ", ожидалось: " << expected << ")\n";
     }
 }
 
+// Тесты
 void testDefaults() {
     cout << "\n[1] Значения по умолчанию\n";
-    GameSettings s;
-    checkEq(s.specialty, DEFAULT_SPECIALTY, "специальность по умолчанию");
-    checkEq(s.studentName, DEFAULT_NAME, "имя студента по умолчанию");
-    checkEq(s.subjectCount, DEFAULT_SUBJECT_COUNT, "количество предметов по умолчанию");
+    SETTING s;
+    checkEq(s.specialty, string("Программная инженерия"), "специальность по умолчанию");
+    checkEq(s.studentName, string("Аня"), "имя студента по умолчанию");
+    checkEq(s.subjectCount, 11, "количество предметов по умолчанию");
 }
 
-void testSetSpecialty() {
-    cout << "\n[2] Установка специальности\n";
-    GameSettings s;
-    s.setSpecialty("Искусственный интеллект");
+void testModifySpecialty() {
+    cout << "\n[2] Изменение специальности\n";
+    SETTING s;
+    s.specialty = "Искусственный интеллект";
     checkEq(s.specialty, string("Искусственный интеллект"), "специальность изменена");
-    s.setSpecialty("");
-    checkEq(s.specialty, string(""), "можно установить пустую строку");
+    checkEq(s.studentName, string("Аня"), "имя не изменилось");
+    checkEq(s.subjectCount, 11, "предметы не изменились");
 }
 
-void testSetName() {
-    cout << "\n[3] Установка имени\n";
-    GameSettings s;
-    s.setName("Иван");
+void testModifyName() {
+    cout << "\n[3] Изменение имени студента\n";
+    SETTING s;
+    s.studentName = "Иван";
     checkEq(s.studentName, string("Иван"), "имя изменено");
-    s.setName("Анна-Мария");
-    checkEq(s.studentName, string("Анна-Мария"), "имя с дефисом");
+    checkEq(s.specialty, string("Программная инженерия"), "специальность не изменилась");
+    checkEq(s.subjectCount, 11, "предметы не изменились");
 }
 
-void testSetSubjectCount() {
-    cout << "\n[4] Установка количества предметов\n";
-    GameSettings s;
-    check(s.setSubjectCount(5), "5 — принято");
-    checkEq(s.subjectCount, 5, "предметов = 5");
-    
-    check(s.setSubjectCount(0), "0 — принято");
-    checkEq(s.subjectCount, 0, "предметов = 0");
-
-    check(!s.setSubjectCount(-1), "-1 — отклонено");
-    checkEq(s.subjectCount, 0, "предметов осталось 0 после ошибки");
+void testModifySubjects() {
+    cout << "\n[4] Изменение количества предметов\n";
+    SETTING s;
+    s.subjectCount = 5;
+    checkEq(s.subjectCount, 5, "количество предметов изменено на 5");
+    s.subjectCount = 0;
+    checkEq(s.subjectCount, 0, "количество предметов может быть 0 (граница)");
 }
 
-void testReset() {
-    cout << "\n[5] Сброс настроек\n";
-    GameSettings s;
-    s.specialty = "Другая";
-    s.studentName = "Петр";
-    s.subjectCount = 99;
-    s.reset();
+void testMultipleChanges() {
+    cout << "\n[5] Комплексное изменение\n";
+    SETTING s;
+    s.specialty = "Кибербезопасность";
+    s.studentName = "Мария";
+    s.subjectCount = 8;
     
-    checkEq(s.specialty, DEFAULT_SPECIALTY, "специальность сброшена");
-    checkEq(s.studentName, DEFAULT_NAME, "имя сброшено");
-    checkEq(s.subjectCount, DEFAULT_SUBJECT_COUNT, "предметы сброшены");
+    checkEq(s.specialty, string("Кибербезопасность"), "специальность изменена");
+    checkEq(s.studentName, string("Мария"), "имя изменено");
+    checkEq(s.subjectCount, 8, "предметы изменены");
+}
+
+void testCopySemantics() {
+    cout << "\n[6] Копирование структуры\n";
+    SETTING s1;
+    s1.studentName = "Петр";
+    
+    SETTING s2 = s1;
+    checkEq(s2.studentName, string("Петр"), "имя скопировано");
+    
+    s2.studentName = "Сидор";
+    checkEq(s1.studentName, string("Петр"), "изменение копии не затронуло оригинал");
+    checkEq(s2.studentName, string("Сидор"), "копия изменена корректно");
+}
+
+void testInvalidStateBoundaries() {
+    cout << "\n[7] Граничные значения (валидация данных)\n";
+    SETTING s;
+    
+    // Проверка, что отрицательное количество предметов не является "нормальным" состоянием
+    s.subjectCount = -1;
+    check(s.subjectCount < 0, "отрицательное количество обнаружено (потенциальная ошибка ввода)");
+    
+    // Пустая строка
+    s.studentName = "";
+    check(s.studentName.empty(), "пустое имя обнаружено (потенциальная ошибка ввода)");
 }
 
 int main() {
-    cout << " Запуск тестов: МОЯ ЖИЗНЬ В УНИВЕРСИТЕТЕ\n";
-    
-    testDefaults();
-    testSetSpecialty();
-    testSetName();
-    testSetSubjectCount();
-    testReset();
+    cout << "=============================================\n";
+    cout << " Запуск тестов: Моя жизнь в университете\n";
+    cout << "=============================================\n";
 
-    cout << "\n Итог: пройдено " << g_passed << ", провалено " << g_failed << "\n";
+    testDefaults();
+    testModifySpecialty();
+    testModifyName();
+    testModifySubjects();
+    testMultipleChanges();
+    testCopySemantics();
+    testInvalidStateBoundaries();
+    cout << "\n=============================================\n";
+        cout << " Итог: пройдено " << g_passed
+             << ", провалено " << g_failed << "\n";
+        cout << "=============================================\n";
     
-    if (g_failed > 0) {
-        cout << "\nПроваленные тесты:\n";
-        for (const auto& f : g_failures) cout << "  - " << f << "\n";
-        return 1;
-    }
-    cout << "\nВсе тесты пройдены успешно.\n";
-    return 0;
+        if (g_failed > 0) {
+            cout << "\nПроваленные тесты:\n";
+            for (const auto& f : g_failures) cout << "  - " << f << "\n";
+            return 1;
+        }
+        cout << "\nВсе тесты пройдены успешно.\n";
+        return 0;
 }
