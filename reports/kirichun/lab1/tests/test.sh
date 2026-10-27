@@ -8,5 +8,6 @@ if [ ! -f test.cpp ]; then
     exit 1
 fi
 
-g++ -std=c++17 -O2 -o test_runner test.cpp
-./test_runner
+g++ -std=c++17 -O2 -o test test.cpp
+
+./test
