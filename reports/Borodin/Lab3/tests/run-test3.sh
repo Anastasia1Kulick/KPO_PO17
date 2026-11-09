@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd '$(dirname "$0")'
+cd "$(dirname "$0")"
 
 if [ ! -f lab3.cpp ]; then
     echo "lab3.cpp not found"
