@@ -30,8 +30,17 @@ class Weapon {
 public:
     std::string name;
     int damage;
-    Weapon() : name("Кулаки"), damage(2) {}
-    Weapon(std::string n, int d) : name(n), damage(d) {}
+    std::string art;
+    Weapon() : name("Кулаки"), damage(2), art(
+        "   ______\n"
+        "  /      \\\n"
+        " |  ____  |\n"
+        " | |    | |\n"
+        " | |____| |\n"
+        "  \\______/"
+    ) {
+    }
+    Weapon(std::string n, int d, std::string a = "") : name(n), damage(d), art(a) {}
 };
 
 class Character {
@@ -65,9 +74,18 @@ public:
     int damage;
     Weapon drop;
     bool hasDrop;
-    Monster() : name("Слизень"), health(5), damage(1), drop(), hasDrop(true) {}
-    Monster(std::string n, int h, int d, Weapon w, bool hd)
-        : name(n), health(h), damage(d), drop(w), hasDrop(hd) {}
+    std::string art;
+    Monster() : name("Слизень"), health(5), damage(1), drop(), hasDrop(true), art(
+        "    _____\n"
+        "   /     \\\n"
+        "  |  o o  |\n"
+        "  |   _   |\n"
+        "   \\_____/"
+    ) {
+    }
+    Monster(std::string n, int h, int d, Weapon w, bool hd, std::string a = "")
+        : name(n), health(h), damage(d), drop(w), hasDrop(hd), art(a) {
+    }
     void TakeDamage(int dmg) {
         health -= dmg;
         if (health < 0) health = 0;
@@ -76,21 +94,173 @@ public:
         return health > 0;
     }
 };
-
+static Weapon GenerateRandomWeapon(int level);
+static Monster GenerateMonster(int level);
+int main()
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    int choice;
+    std::ifstream opFile("options.txt");
+    if (opFile.is_open()) opFile.close();
+    else {
+        std::ofstream opFile("options.txt");
+        if (opFile.is_open()) {
+            opFile << 10 << " " << 50 << " Легкая\n";
+            opFile.close();
+        }
+        else std::cerr << "Ошибка при создании файла";
+    }
+    while (true) {
+        system("cls");
+        DisplayMenu();
+        std::cin >> choice;
+        if (choice >= 1 && choice <= 3) {
+            menuFunctions[choice - 1]();
+        }
+        else if (choice == AboutOp) About();
+        else if (choice == ExitOp) break;
+    }
+}
+void DisplayMenu() {
+    std::cout << "Приключение в подземелье \n";
+    std::cout << "1. Начать игру\n";
+    std::cout << "2. Загрузить игру\n";
+    std::cout << "3. Настройки\n";
+    std::cout << "4. О программе\n";
+    std::cout << "5. Выход\n";
+}
 static Weapon GenerateRandomWeapon(int level) {
-    std::string names[] = {"Ржавый меч", "Дубина", "Кинжал", "Топор", "Копьё", "Булава"};
+    std::string names[] = { "Ржавый меч", "Дубина", "Кинжал", "Топор", "Копьё", "Булава" };
+    std::string arts[] = {
+        "        /\\\n"
+        "       /  |\n"
+        "      /   |\n"
+        "     /    |\n"
+        "    /     |\n"
+        "   /______|\n"
+        "   |______|\n"
+        "     |  |\n"
+        "     |  |\n"
+        "     |  |\n"
+        "    _|__|_",
+        "      ____\n"
+        "     / .. \\\n"
+        "    | .  . |\n"
+        "    |  ..  |\n"
+        "     \\____/\n"
+        "      |  |\n"
+        "      |  |\n"
+        "      |  |\n"
+        "      |  |\n"
+        "     _|__|_",
+        "       /\\\n"
+        "      /  \\\n"
+        "     /    \\\n"
+        "    /______\\\n"
+        "    |______|\n"
+        "      |  |\n"
+        "      |  |\n"
+        "      |  |\n"
+        "     _|__|_",
+        "     _____\n"
+        "    /     \\\n"
+        "   /  ___  \\\n"
+        "  |  /   \\  |\n"
+        "  |  \\___/  |\n"
+        "   \\_______/\n"
+        "      |  |\n"
+        "      |  |\n"
+        "      |  |\n"
+        "     _|__|_",
+        "        /\\\n"
+        "       /  \\\n"
+        "      /    \\\n"
+        "     /      \\\n"
+        "    /________\\\n"
+        "       |  |\n"
+        "       |  |\n"
+        "       |  |\n"
+        "       |  |\n"
+        "       |  |\n"
+        "      _|__|_",
+        "     _/\\_/\\_\n"
+        "    /  o o  \\\n"
+        "   | o  |  o |\n"
+        "    \\  o o  /\n"
+        "     \\_/|\\_/\n"
+        "       |  |\n"
+        "       |  |\n"
+        "       |  |\n"
+        "      _|__|_"
+    };
     int idx = rand() % 6;
     int dmg = 3 + rand() % (3 + level);
-    return Weapon(names[idx], dmg);
+    return Weapon(names[idx], dmg, arts[idx]);
 }
 
 static Monster GenerateMonster(int level) {
-    std::string names[] = {"Слизень", "Гоблин", "Скелет", "Паук", "Орк", "Тролль"};
+    std::string names[] = { "Слизень", "Гоблин", "Скелет", "Паук", "Орк", "Тролль" };
+    std::string arts[] = {
+        "    _____\n"
+        "   /     \\\n"
+        "  |  o o  |\n"
+        "  |   _   |\n"
+        "  |  \\_/  |\n"
+        "   \\_____/",
+        "   /\\    /\\\n"
+        "  /  \\  /  \\\n"
+        " |    \\/    |\n"
+        " |  o    o  |\n"
+        " |    __    |\n"
+        "  \\________/\n",
+        "    _____\n"
+        "   /     \\\n"
+        "  |  o o  |\n"
+        "  |   _   |\n"
+        "   \\_____/\n"
+        "     | |\n"
+        "    /| |\\\n"
+        "   / | | \\\n"
+        "     | |\n"
+        "    /   \\\n"
+        "   /     \\",
+        "  /\\      /\\\n"
+        " /  \\    /  \\\n"
+        "/    \\  /    \\\n"
+        "\\     \\/     /\n"
+        " \\  o    o  /\n"
+        "  \\   __   /\n"
+        "  /\\  \\/  /\\\n"
+        " /  \\    /  \\\n"
+        "/    \\  /    \\",
+        "    ______\n"
+        "   /      \\\n"
+        "  | o    o |\n"
+        "  |   __   |\n"
+        "  |  /  \\  |\n"
+        "  |  \\__/  |\n"
+        "   \\______/\n"
+        "    /|  |\\\n"
+        "   / |  | \\\n"
+        "  /  |  |  \\",
+        "     ______\n"
+        "    /      \\\n"
+        "   | o    o |\n"
+        "   |   __   |\n"
+        "   |  /  \\  |\n"
+        "   |  \\__/  |\n"
+        "    \\______/\n"
+        "   /|      |\\\n"
+        "  / |      | \\\n"
+        " /  |      |  \\\n"
+        "/   |      |   \\"
+    };
     int idx = rand() % 6;
     int hp = 3 + level + rand() % (3 + level);
     int dmg = 1 + rand() % (1 + level);
     Weapon drop = GenerateRandomWeapon(level);
-    return Monster(names[idx], hp, dmg, drop, true);
+    return Monster(names[idx], hp, dmg, drop, true, arts[idx]);
 }
 
 void GameStart() {
@@ -130,6 +300,7 @@ void GameStart() {
         system("cls");
         std::cout << "=== Этаж " << floor << " из " << totalFloors << " ===\n";
         Monster monster = GenerateMonster(floor * diffMod);
+        std::cout << monster.art << "\n";
         std::cout << "На вас напал " << monster.name << "! (HP: " << monster.health << ", урон: " << monster.damage << ")\n";
 
         while (hero.IsAlive() && monster.IsAlive()) {
@@ -168,8 +339,9 @@ void GameStart() {
             break;
         }
 
-        std::cout << "\nИз монстра выпало оружие: " << monster.drop.name
-                  << " (урон: " << monster.drop.damage << ")\n";
+        std::cout << "\nИз монстра выпало оружие:\n";
+        std::cout << monster.drop.art << "\n";
+        std::cout << monster.drop.name << " (урон: " << monster.drop.damage << ")\n";
         std::cout << "1. Экипировать\n2. Оставить текущее\nВыбор: ";
         int pick;
         std::cin >> pick;
@@ -200,7 +372,7 @@ void Settings() {
     int choice, NewVal, count = 1;
     std::stack<Options> optStack;
     std::ifstream file("options.txt");
-    if(!file.is_open()) std::cerr << "Ошибка при открытии файла";
+    if (!file.is_open()) std::cerr << "Ошибка при открытии файла";
     Options cur;
     file >> cur.health >> cur.size >> cur.diff;
     optStack.push(cur);
@@ -252,18 +424,18 @@ void Settings() {
             std::cout << "Сложность (1.Легко 2.Нормально 3.Тяжело): ";
             std::cin >> NewVal;
             if (NewVal < 1 || NewVal > 3) std::cout << "Неверное Значение\n";
-            else 
+            else
                 switch (NewVal) {
-            case 1:
-                cur.diff = "Легко";
-                break;
-            case 2:
-                cur.diff = "Нормально";
-                break;
-            case 3:
-                cur.diff = "Тяжело";
-                break;
-            }
+                case 1:
+                    cur.diff = "Легко";
+                    break;
+                case 2:
+                    cur.diff = "Нормально";
+                    break;
+                case 3:
+                    cur.diff = "Тяжело";
+                    break;
+                }
             optStack.push(cur);
             count++;
             std::ofstream file("options.txt");
@@ -293,43 +465,9 @@ void Settings() {
 }
 void About() {
     system("cls");
-    std::cout << "Версия игры 0.1\nВыполнил Бородин Кирилл";
+    std::cout << "Версия игры 0.5\nВыполнил Бородин Кирилл";
     std::cout << "\nНажмите Enter для продолжения ";
     std::cin.ignore();
     std::cin.get();
     return;
-}
-int main()
-{
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
-    int choice;
-    std::ifstream opFile("options.txt");
-    if (opFile.is_open()) opFile.close();
-    else {
-        std::ofstream opFile("options.txt");
-        if (opFile.is_open()) {
-            opFile << 10 << " " << 50 << " Легкая\n";
-            opFile.close();
-        }
-        else std::cerr << "Ошибка при создании файла";
-    }
-    while (true) {
-        system("cls");
-        DisplayMenu();
-        std::cin >> choice;
-        if (choice >= 1 && choice <= 3) {
-            menuFunctions[choice - 1]();
-        }
-        else if (choice == AboutOp) About();
-        else if (choice == ExitOp) break;
-    }
-}
-void DisplayMenu() {
-    std::cout << "Приключение в подземелье \n";
-    std::cout << "1. Начать игру\n";
-    std::cout << "2. Загрузить игру\n";
-    std::cout << "3. Настройки\n";
-    std::cout << "4. О программе\n";
-    std::cout << "5. Выход\n";
 }
