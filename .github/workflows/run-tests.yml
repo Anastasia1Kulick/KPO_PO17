@@ -39,6 +39,8 @@ jobs:
           echo "Изменённые лабы: $LAB_DIRS"
 
       - name: Run tests
+        env:
+          CHANGED_DIRS: ${{ steps.changed.outputs.dirs }}
         run: |
           chmod +x scripts/run_lab_tests.sh
-          ./scripts/run_lab_tests.sh ${{ steps.changed.outputs.dirs }} >> "$GITHUB_STEP_SUMMARY"
+          ./scripts/run_lab_tests.sh $CHANGED_DIRS >> "$GITHUB_STEP_SUMMARY"
