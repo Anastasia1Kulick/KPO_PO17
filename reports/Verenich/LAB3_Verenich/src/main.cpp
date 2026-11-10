@@ -15,43 +15,42 @@
 
 using namespace std;
 
-// ==================== КОНСТАНТЫ ГЛАВНОГО МЕНЮ ====================
 const int MENU_START_GAME = 1;
 const int MENU_LOAD_GAME = 2;
 const int MENU_SETTINGS = 3;
 const int MENU_ABOUT = 4;
 const int MENU_EXIT = 5;
 
-// ==================== КОНСТАНТЫ ПОДМЕНЮ НАСТРОЕК ====================
+// ==================== ГЉГЋГЌГ‘Г’ГЂГЌГ’Г› ГЏГЋГ„ГЊГ…ГЌГћ ГЌГЂГ‘Г’ГђГЋГ…ГЉ ====================
 const int SET_DIFFICULTY = 1;
 const int SET_ANIMALS = 2;
 const int SET_ADD_ANIMAL = 3;
 const int SET_BACK = 4;
 
-// ==================== КОНСТАНТЫ ПОДМЕНЮ ЖИВОТНЫХ ====================
+// ==================== ГЉГЋГЌГ‘Г’ГЂГЌГ’Г› ГЏГЋГ„ГЊГ…ГЌГћ Г†Г€Г‚ГЋГ’ГЌГ›Г• ====================
 const int ANIMAL_EDIT = 1;
 const int ANIMAL_DELETE = 2;
 const int ANIMAL_BACK = 3;
 
 const int DIFF_COUNT = 3;
 
-// ==================== КОНСТАНТЫ ИГРОВОГО ПРОЦЕССА ====================
+// ==================== ГЉГЋГЌГ‘Г’ГЂГЌГ’Г› Г€ГѓГђГЋГ‚ГЋГѓГЋ ГЏГђГЋГ–Г…Г‘Г‘ГЂ ====================
 const int ACTION_FEED = 1;
 const int ACTION_CARE = 2;
 const int ACTION_BUY_FOOD = 3;
 const int ACTION_BUY_ANIMAL = 4;
 const int ACTION_END_DAY = 5;
 
-// ==================== ВЕРСИЯ ПРОГРАММЫ ====================
+// ==================== Г‚Г…ГђГ‘Г€Гџ ГЏГђГЋГѓГђГЂГЊГЊГ› ====================
 const string PROGRAM_VERSION = "3.0";
 const string STUDENT_NAME = "Viarenich Daniil";
 const string SETTINGS_FILE = "settings.txt";
 
-// ==================== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ====================
+// ==================== ГѓГ‹ГЋГЃГЂГ‹ГњГЌГ›Г… ГЌГЂГ‘Г’ГђГЋГ‰ГЉГ€ ====================
 string difficulty = "Medium";
 map<string, int> startingAnimals;
 
-// ==================== КЛАСС FOOD ====================
+// ==================== ГЉГ‹ГЂГ‘Г‘ FOOD ====================
 class Food
 {
 private:
@@ -68,7 +67,7 @@ public:
     int    getNutrition() const { return nutrition; }
 };
 
-// ==================== КЛАСС ANIMAL ====================
+// ==================== ГЉГ‹ГЂГ‘Г‘ ANIMAL ====================
 class Animal
 {
 private:
@@ -93,7 +92,7 @@ public:
         foodType(food), buyPrice(buyP), income(inc) {
     }
 
-    // --- Геттеры ---
+    // --- ГѓГҐГІГІГҐГ°Г» ---
     string getType()      const { return type; }
     string getName()      const { return name; }
     int    getHunger()    const { return hunger; }
@@ -105,21 +104,21 @@ public:
 
     bool isAlive() const { return health > 0; }
 
-    // Кормление
+    // ГЉГ®Г°Г¬Г«ГҐГ­ГЁГҐ
     void feed(int nutrition)
     {
         hunger = max(0, hunger - nutrition);
         if (hunger < 20) happiness = min(100, happiness + 5);
     }
 
-    // Забота
+    // Г‡Г ГЎГ®ГІГ 
     void care()
     {
         happiness = min(100, happiness + 10);
         health = min(100, health + 5);
     }
 
-    // Ежедневное обновление
+    // Г…Г¦ГҐГ¤Г­ГҐГўГ­Г®ГҐ Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ
     void dailyUpdate()
     {
         hunger = min(100, hunger + 20);
@@ -131,7 +130,7 @@ public:
         if (health == 0) happiness = 0;
     }
 
-    // Доход за день
+    // Г„Г®ГµГ®Г¤ Г§Г  Г¤ГҐГ­Гј
     int dailyIncome() const
     {
         if (health <= 0) return 0;
@@ -139,7 +138,7 @@ public:
     }
 };
 
-// ==================== КЛАСС PLAYER ====================
+// ==================== ГЉГ‹ГЂГ‘Г‘ PLAYER ====================
 class Player
 {
 private:
@@ -158,7 +157,7 @@ public:
     const vector<Animal>& getAnimals() const { return animals; }
     const map<string, int>& getFoodStock() const { return foodStock; }
 
-    // Инициализация из настроек
+    // Г€Г­ГЁГ¶ГЁГ Г«ГЁГ§Г Г¶ГЁГї ГЁГ§ Г­Г Г±ГІГ°Г®ГҐГЄ
     void initFromSettings(const map<string, int>& startAnimals,
         int startMoney, int actionsPerDay)
     {
@@ -182,7 +181,7 @@ public:
         foodStock["Swill"] = 5;
     }
 
-    // Создание животного по типу
+    // Г‘Г®Г§Г¤Г Г­ГЁГҐ Г¦ГЁГўГ®ГІГ­Г®ГЈГ® ГЇГ® ГІГЁГЇГі
     static Animal createAnimalByType(const string& type, int id)
     {
         string name = type + "_" + to_string(id);
@@ -196,7 +195,7 @@ public:
         return Animal(type, name, "Hay", 60, 7);
     }
 
-    // --- Действия ---
+    // --- Г„ГҐГ©Г±ГІГўГЁГї ---
 
     bool feedAnimal(int index, int nutrition)
     {
@@ -271,7 +270,7 @@ public:
     void resetActions(int perDay) { actionsLeft = perDay; }
 };
 
-// ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+// ==================== Г‚Г‘ГЏГЋГЊГЋГѓГЂГ’Г…Г‹ГњГЌГ›Г… Г”Г“ГЌГЉГ–Г€Г€ ====================
 void setupLocale()
 {
 #ifdef _WIN32
@@ -308,7 +307,7 @@ int startMoney()
     return 1000;
 }
 
-// ==================== ФАЙЛОВЫЕ ФУНКЦИИ ====================
+// ==================== Г”ГЂГ‰Г‹ГЋГ‚Г›Г… Г”Г“ГЌГЉГ–Г€Г€ ====================
 void setDefaults()
 {
     difficulty = "Medium";
@@ -372,26 +371,26 @@ void initSettings()
 {
     if (!loadSettings())
     {
-        cout << "Файл настроек не найден. Созданы по умолчанию.\n";
+        cout << "Г”Г Г©Г« Г­Г Г±ГІГ°Г®ГҐГЄ Г­ГҐ Г­Г Г©Г¤ГҐГ­. Г‘Г®Г§Г¤Г Г­Г» ГЇГ® ГіГ¬Г®Г«Г·Г Г­ГЁГѕ.\n";
         setDefaults();
         saveSettings();
     }
 }
 
-// ==================== ИГРОВОЙ ПРОЦЕСС ====================
+// ==================== Г€ГѓГђГЋГ‚ГЋГ‰ ГЏГђГЋГ–Г…Г‘Г‘ ====================
 
 void printGameState(const Player& p)
 {
     cout << "\n+---------------------------------------+\n";
-    cout << "| День: " << p.getDay()
-        << " | Деньги: " << p.getMoney()
-        << " | Действий: " << p.getActionsLeft() << "\n";
+    cout << "| Г„ГҐГ­Гј: " << p.getDay()
+        << " | Г„ГҐГ­ГјГЈГЁ: " << p.getMoney()
+        << " | Г„ГҐГ©Г±ГІГўГЁГ©: " << p.getActionsLeft() << "\n";
     cout << "+---------------------------------------+\n";
 
-    cout << "Животные (" << p.getAnimals().size() << "):\n";
+    cout << "Г†ГЁГўГ®ГІГ­Г»ГҐ (" << p.getAnimals().size() << "):\n";
     if (p.getAnimals().empty())
     {
-        cout << "  (нет животных)\n";
+        cout << "  (Г­ГҐГІ Г¦ГЁГўГ®ГІГ­Г»Гµ)\n";
     }
     else
     {
@@ -399,15 +398,15 @@ void printGameState(const Player& p)
         for (const auto& a : p.getAnimals())
         {
             cout << "  " << i++ << ". " << a.getType()
-                << " \"" << a.getName() << "\" — "
-                << "голод:" << a.getHunger()
-                << " счастье:" << a.getHappiness()
-                << " здоровье:" << a.getHealth() << "\n";
+                << " \"" << a.getName() << "\" В— "
+                << "ГЈГ®Г«Г®Г¤:" << a.getHunger()
+                << " Г±Г·Г Г±ГІГјГҐ:" << a.getHappiness()
+                << " Г§Г¤Г®Г°Г®ГўГјГҐ:" << a.getHealth() << "\n";
         }
     }
 
-    cout << "Еда: ";
-    if (p.getFoodStock().empty()) cout << "(нет)";
+    cout << "Г…Г¤Г : ";
+    if (p.getFoodStock().empty()) cout << "(Г­ГҐГІ)";
     else for (const auto& f : p.getFoodStock())
         cout << f.first << "=" << f.second << " ";
     cout << "\n";
@@ -435,17 +434,17 @@ vector<Animal> animalCatalog()
 
 void actionFeed(Player& p)
 {
-    if (p.getAnimals().empty()) { cout << "Нет животных.\n"; return; }
+    if (p.getAnimals().empty()) { cout << "ГЌГҐГІ Г¦ГЁГўГ®ГІГ­Г»Гµ.\n"; return; }
 
-    cout << "Выберите животное для кормления:\n";
+    cout << "Г‚Г»ГЎГҐГ°ГЁГІГҐ Г¦ГЁГўГ®ГІГ­Г®ГҐ Г¤Г«Гї ГЄГ®Г°Г¬Г«ГҐГ­ГЁГї:\n";
     int i = 1;
     for (const auto& a : p.getAnimals())
     {
         cout << "  " << i++ << ". " << a.getType()
-            << " \"" << a.getName() << "\" (ест " << a.getFoodType()
-            << ", голод " << a.getHunger() << ")\n";
+            << " \"" << a.getName() << "\" (ГҐГ±ГІ " << a.getFoodType()
+            << ", ГЈГ®Г«Г®Г¤ " << a.getHunger() << ")\n";
     }
-    cout << "Номер (0 — отмена): ";
+    cout << "ГЌГ®Г¬ГҐГ° (0 В— Г®ГІГ¬ГҐГ­Г ): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)p.getAnimals().size()) return;
@@ -456,7 +455,7 @@ void actionFeed(Player& p)
 
     if (stock <= 0)
     {
-        cout << "Нет еды \"" << food << "\" на складе!\n";
+        cout << "ГЌГҐГІ ГҐГ¤Г» \"" << food << "\" Г­Г  Г±ГЄГ«Г Г¤ГҐ!\n";
         return;
     }
 
@@ -465,71 +464,71 @@ void actionFeed(Player& p)
         if (f.getName() == food) { nutrition = f.getNutrition(); break; }
 
     if (p.feedAnimal(idx - 1, nutrition))
-        cout << "Животное покормлено.\n";
+        cout << "Г†ГЁГўГ®ГІГ­Г®ГҐ ГЇГ®ГЄГ®Г°Г¬Г«ГҐГ­Г®.\n";
     else
-        cout << "Не удалось покормить.\n";
+        cout << "ГЌГҐ ГіГ¤Г Г«Г®Г±Гј ГЇГ®ГЄГ®Г°Г¬ГЁГІГј.\n";
 }
 
 void actionCare(Player& p)
 {
-    if (p.getAnimals().empty()) { cout << "Нет животных.\n"; return; }
+    if (p.getAnimals().empty()) { cout << "ГЌГҐГІ Г¦ГЁГўГ®ГІГ­Г»Гµ.\n"; return; }
 
-    cout << "Выберите животное для заботы:\n";
+    cout << "Г‚Г»ГЎГҐГ°ГЁГІГҐ Г¦ГЁГўГ®ГІГ­Г®ГҐ Г¤Г«Гї Г§Г ГЎГ®ГІГ»:\n";
     int i = 1;
     for (const auto& a : p.getAnimals())
         cout << "  " << i++ << ". " << a.getType() << " \"" << a.getName() << "\"\n";
-    cout << "Номер (0 — отмена): ";
+    cout << "ГЌГ®Г¬ГҐГ° (0 В— Г®ГІГ¬ГҐГ­Г ): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)p.getAnimals().size()) return;
 
     if (p.careAnimal(idx - 1))
-        cout << "Животное обласкано.\n";
+        cout << "Г†ГЁГўГ®ГІГ­Г®ГҐ Г®ГЎГ«Г Г±ГЄГ Г­Г®.\n";
     else
-        cout << "Нет действий!\n";
+        cout << "ГЌГҐГІ Г¤ГҐГ©Г±ГІГўГЁГ©!\n";
 }
 
 void actionBuyFood(Player& p)
 {
     auto catalog = foodCatalog();
-    cout << "Магазин еды:\n";
+    cout << "ГЊГ ГЈГ Г§ГЁГ­ ГҐГ¤Г»:\n";
     int i = 1;
     for (const auto& f : catalog)
     {
         cout << "  " << i++ << ". " << f.getName()
-            << " — цена " << f.getPrice()
-            << ", питательность " << f.getNutrition() << "\n";
+            << " В— Г¶ГҐГ­Г  " << f.getPrice()
+            << ", ГЇГЁГІГ ГІГҐГ«ГјГ­Г®Г±ГІГј " << f.getNutrition() << "\n";
     }
-    cout << "Номер (0 — отмена): ";
+    cout << "ГЌГ®Г¬ГҐГ° (0 В— Г®ГІГ¬ГҐГ­Г ): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)catalog.size()) return;
 
     const Food& f = catalog[idx - 1];
-    cout << "Сколько купить? ";
+    cout << "Г‘ГЄГ®Г«ГјГЄГ® ГЄГіГЇГЁГІГј? ";
     int amount; cin >> amount;
     if (cin.fail()) { clearInput(); return; }
     if (amount <= 0) return;
 
     if (p.buyFood(f.getName(), f.getPrice(), amount))
-        cout << "Куплено " << amount << " x " << f.getName() << "\n";
+        cout << "ГЉГіГЇГ«ГҐГ­Г® " << amount << " x " << f.getName() << "\n";
     else
-        cout << "Недостаточно денег или действий!\n";
+        cout << "ГЌГҐГ¤Г®Г±ГІГ ГІГ®Г·Г­Г® Г¤ГҐГ­ГҐГЈ ГЁГ«ГЁ Г¤ГҐГ©Г±ГІГўГЁГ©!\n";
 }
 
 void actionBuyAnimal(Player& p)
 {
     auto catalog = animalCatalog();
-    cout << "Магазин животных:\n";
+    cout << "ГЊГ ГЈГ Г§ГЁГ­ Г¦ГЁГўГ®ГІГ­Г»Гµ:\n";
     int i = 1;
     for (const auto& a : catalog)
     {
         cout << "  " << i++ << ". " << a.getType()
-            << " — цена " << a.getBuyPrice()
-            << ", ест " << a.getFoodType()
-            << ", доход " << a.getIncome() << "/день\n";
+            << " В— Г¶ГҐГ­Г  " << a.getBuyPrice()
+            << ", ГҐГ±ГІ " << a.getFoodType()
+            << ", Г¤Г®ГµГ®Г¤ " << a.getIncome() << "/Г¤ГҐГ­Гј\n";
     }
-    cout << "Номер (0 — отмена): ";
+    cout << "ГЌГ®Г¬ГҐГ° (0 В— Г®ГІГ¬ГҐГ­Г ): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)catalog.size()) return;
@@ -539,21 +538,21 @@ void actionBuyAnimal(Player& p)
     Animal fresh = Player::createAnimalByType(chosen.getType(), id);
 
     if (p.buyAnimal(fresh))
-        cout << "Куплено: " << fresh.getType() << " \"" << fresh.getName() << "\"\n";
+        cout << "ГЉГіГЇГ«ГҐГ­Г®: " << fresh.getType() << " \"" << fresh.getName() << "\"\n";
     else
-        cout << "Недостаточно денег или действий!\n";
+        cout << "ГЌГҐГ¤Г®Г±ГІГ ГІГ®Г·Г­Г® Г¤ГҐГ­ГҐГЈ ГЁГ«ГЁ Г¤ГҐГ©Г±ГІГўГЁГ©!\n";
 }
 
-// Главный цикл игры
+// ГѓГ«Г ГўГ­Г»Г© Г¶ГЁГЄГ« ГЁГЈГ°Г»
 void startGame()
 {
     Player player;
     player.initFromSettings(startingAnimals, startMoney(), actionsPerDay());
 
-    cout << "\n=== НАЧАЛО ИГРЫ ===\n";
-    cout << "Сложность: " << difficulty << "\n";
-    cout << "Начальные деньги: " << player.getMoney() << "\n";
-    cout << "Действий в день: " << player.getActionsLeft() << "\n";
+    cout << "\n=== ГЌГЂГ—ГЂГ‹ГЋ Г€ГѓГђГ› ===\n";
+    cout << "Г‘Г«Г®Г¦Г­Г®Г±ГІГј: " << difficulty << "\n";
+    cout << "ГЌГ Г·Г Г«ГјГ­Г»ГҐ Г¤ГҐГ­ГјГЈГЁ: " << player.getMoney() << "\n";
+    cout << "Г„ГҐГ©Г±ГІГўГЁГ© Гў Г¤ГҐГ­Гј: " << player.getActionsLeft() << "\n";
 
     while (true)
     {
@@ -561,10 +560,10 @@ void startGame()
 
         if (player.getActionsLeft() <= 0)
         {
-            cout << "\nДействия на сегодня закончились.\n";
-            cout << "1. Завершить день\n";
-            cout << "2. Выйти в главное меню\n";
-            cout << "Выбор: ";
+            cout << "\nГ„ГҐГ©Г±ГІГўГЁГї Г­Г  Г±ГҐГЈГ®Г¤Г­Гї Г§Г ГЄГ®Г­Г·ГЁГ«ГЁГ±Гј.\n";
+            cout << "1. Г‡Г ГўГҐГ°ГёГЁГІГј Г¤ГҐГ­Гј\n";
+            cout << "2. Г‚Г»Г©ГІГЁ Гў ГЈГ«Г ГўГ­Г®ГҐ Г¬ГҐГ­Гѕ\n";
+            cout << "Г‚Г»ГЎГ®Г°: ";
             int c; cin >> c;
             if (cin.fail()) { clearInput(); continue; }
 
@@ -572,19 +571,19 @@ void startGame()
             {
                 player.endDay();
                 player.resetActions(actionsPerDay());
-                cout << "--- День " << player.getDay() << " начался ---\n";
+                cout << "--- Г„ГҐГ­Гј " << player.getDay() << " Г­Г Г·Г Г«Г±Гї ---\n";
             }
             else if (c == 2) return;
             continue;
         }
 
-        cout << "\n--- Меню дня ---\n";
-        cout << ACTION_FEED << ". Покормить животное\n";
-        cout << ACTION_CARE << ". Позаботиться о животном\n";
-        cout << ACTION_BUY_FOOD << ". Купить еду\n";
-        cout << ACTION_BUY_ANIMAL << ". Купить животное\n";
-        cout << ACTION_END_DAY << ". Завершить день\n";
-        cout << "Выберите действие: ";
+        cout << "\n--- ГЊГҐГ­Гѕ Г¤Г­Гї ---\n";
+        cout << ACTION_FEED << ". ГЏГ®ГЄГ®Г°Г¬ГЁГІГј Г¦ГЁГўГ®ГІГ­Г®ГҐ\n";
+        cout << ACTION_CARE << ". ГЏГ®Г§Г ГЎГ®ГІГЁГІГјГ±Гї Г® Г¦ГЁГўГ®ГІГ­Г®Г¬\n";
+        cout << ACTION_BUY_FOOD << ". ГЉГіГЇГЁГІГј ГҐГ¤Гі\n";
+        cout << ACTION_BUY_ANIMAL << ". ГЉГіГЇГЁГІГј Г¦ГЁГўГ®ГІГ­Г®ГҐ\n";
+        cout << ACTION_END_DAY << ". Г‡Г ГўГҐГ°ГёГЁГІГј Г¤ГҐГ­Гј\n";
+        cout << "Г‚Г»ГЎГҐГ°ГЁГІГҐ Г¤ГҐГ©Г±ГІГўГЁГҐ: ";
 
         int choice;
         cin >> choice;
@@ -599,26 +598,26 @@ void startGame()
         case ACTION_END_DAY:
             player.endDay();
             player.resetActions(actionsPerDay());
-            cout << "--- День " << player.getDay() << " начался ---\n";
+            cout << "--- Г„ГҐГ­Гј " << player.getDay() << " Г­Г Г·Г Г«Г±Гї ---\n";
             break;
         default:
-            cout << "Неверный пункт!\n";
+            cout << "ГЌГҐГўГҐГ°Г­Г»Г© ГЇГіГ­ГЄГІ!\n";
         }
     }
 }
 
-// ==================== ПОДМЕНЮ НАСТРОЕК ====================
+// ==================== ГЏГЋГ„ГЊГ…ГЌГћ ГЌГЂГ‘Г’ГђГЋГ…ГЉ ====================
 void difficultySubmenu()
 {
     const string options[DIFF_COUNT] = { "Easy", "Medium", "Hard" };
     while (true)
     {
-        cout << "\n===== УРОВЕНЬ СЛОЖНОСТИ =====\n";
+        cout << "\n===== Г“ГђГЋГ‚Г…ГЌГњ Г‘Г‹ГЋГ†ГЌГЋГ‘Г’Г€ =====\n";
         for (int i = 0; i < DIFF_COUNT; i++)
             cout << (i + 1) << ". " << options[i] << "\n";
-        cout << (DIFF_COUNT + 1) << ". Назад\n";
-        cout << "Текущий: " << difficulty << "\n";
-        cout << "Выберите: ";
+        cout << (DIFF_COUNT + 1) << ". ГЌГ Г§Г Г¤\n";
+        cout << "Г’ГҐГЄГіГ№ГЁГ©: " << difficulty << "\n";
+        cout << "Г‚Г»ГЎГҐГ°ГЁГІГҐ: ";
 
         int c; cin >> c;
         if (cin.fail()) { clearInput(); continue; }
@@ -627,7 +626,7 @@ void difficultySubmenu()
         {
             difficulty = options[c - 1];
             saveSettings();
-            cout << "Установлено: " << difficulty << "\n";
+            cout << "Г“Г±ГІГ Г­Г®ГўГ«ГҐГ­Г®: " << difficulty << "\n";
         }
         else if (c == DIFF_COUNT + 1) return;
     }
@@ -637,12 +636,12 @@ void animalsSubmenu()
 {
     while (true)
     {
-        cout << "\n===== ЖИВОТНЫЕ (стартовые) =====\n";
+        cout << "\n===== Г†Г€Г‚ГЋГ’ГЌГ›Г… (Г±ГІГ Г°ГІГ®ГўГ»ГҐ) =====\n";
         int i = 1;
         for (const auto& p : startingAnimals)
-            cout << i++ << ". " << p.first << " — " << p.second << "\n";
-        cout << "0. Назад\n";
-        cout << "Выберите: ";
+            cout << i++ << ". " << p.first << " В— " << p.second << "\n";
+        cout << "0. ГЌГ Г§Г Г¤\n";
+        cout << "Г‚Г»ГЎГҐГ°ГЁГІГҐ: ";
 
         int c; cin >> c;
         if (cin.fail()) { clearInput(); continue; }
@@ -656,17 +655,17 @@ void animalsSubmenu()
         while (true)
         {
             cout << "\n--- " << name << " (" << startingAnimals[name] << ") ---\n";
-            cout << ANIMAL_EDIT << ". Изменить количество\n";
-            cout << ANIMAL_DELETE << ". Удалить\n";
-            cout << ANIMAL_BACK << ". Назад\n";
-            cout << "Выбор: ";
+            cout << ANIMAL_EDIT << ". Г€Г§Г¬ГҐГ­ГЁГІГј ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ®\n";
+            cout << ANIMAL_DELETE << ". Г“Г¤Г Г«ГЁГІГј\n";
+            cout << ANIMAL_BACK << ". ГЌГ Г§Г Г¤\n";
+            cout << "Г‚Г»ГЎГ®Г°: ";
 
             int a; cin >> a;
             if (cin.fail()) { clearInput(); continue; }
 
             if (a == ANIMAL_EDIT)
             {
-                cout << "Новое количество (0..1000): ";
+                cout << "ГЌГ®ГўГ®ГҐ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® (0..1000): ";
                 int v; cin >> v;
                 if (cin.fail()) { clearInput(); continue; }
                 if (v < 0 || v > 1000) continue;
@@ -686,11 +685,11 @@ void animalsSubmenu()
 
 void addAnimalSubmenu()
 {
-    cout << "Название животного: ";
+    cout << "ГЌГ Г§ГўГ Г­ГЁГҐ Г¦ГЁГўГ®ГІГ­Г®ГЈГ®: ";
     string name; cin >> name;
     if (name.empty() || startingAnimals.count(name)) return;
 
-    cout << "Количество: ";
+    cout << "ГЉГ®Г«ГЁГ·ГҐГ±ГІГўГ®: ";
     int c; cin >> c;
     if (cin.fail()) { clearInput(); return; }
     if (c < 0 || c > 1000) return;
@@ -703,12 +702,12 @@ void settingsMenu()
 {
     while (true)
     {
-        cout << "\n===== НАСТРОЙКИ =====\n";
-        cout << SET_DIFFICULTY << ". Сложность (" << difficulty << ")\n";
-        cout << SET_ANIMALS << ". Животные (" << startingAnimals.size() << ")\n";
-        cout << SET_ADD_ANIMAL << ". Добавить животное\n";
-        cout << SET_BACK << ". Назад\n";
-        cout << "Выберите: ";
+        cout << "\n===== ГЌГЂГ‘Г’ГђГЋГ‰ГЉГ€ =====\n";
+        cout << SET_DIFFICULTY << ". Г‘Г«Г®Г¦Г­Г®Г±ГІГј (" << difficulty << ")\n";
+        cout << SET_ANIMALS << ". Г†ГЁГўГ®ГІГ­Г»ГҐ (" << startingAnimals.size() << ")\n";
+        cout << SET_ADD_ANIMAL << ". Г„Г®ГЎГ ГўГЁГІГј Г¦ГЁГўГ®ГІГ­Г®ГҐ\n";
+        cout << SET_BACK << ". ГЌГ Г§Г Г¤\n";
+        cout << "Г‚Г»ГЎГҐГ°ГЁГІГҐ: ";
 
         int c; cin >> c;
         if (cin.fail()) { clearInput(); continue; }
@@ -723,36 +722,36 @@ void settingsMenu()
     }
 }
 
-// ==================== ПРОЧИЕ ПУНКТЫ ====================
+// ==================== ГЏГђГЋГ—Г€Г… ГЏГ“ГЌГЉГ’Г› ====================
 void loadGame()
 {
-    cout << "\n=== ЗАГРУЗКА ИГРЫ ===\n";
-    cout << "Функция пока недоступна.\n";
-    cout << "Enter для возврата...";
+    cout << "\n=== Г‡ГЂГѓГђГ“Г‡ГЉГЂ Г€ГѓГђГ› ===\n";
+    cout << "Г”ГіГ­ГЄГ¶ГЁГї ГЇГ®ГЄГ  Г­ГҐГ¤Г®Г±ГІГіГЇГ­Г .\n";
+    cout << "Enter Г¤Г«Гї ГўГ®Г§ГўГ°Г ГІГ ...";
     clearInput(); cin.get();
 }
 
 void aboutProgram()
 {
-    cout << "\n=== О ПРОГРАММЕ ===\n";
-    cout << "Название: Веселая ферма\n";
-    cout << "Версия: " << PROGRAM_VERSION << "\n";
-    cout << "Студент: " << STUDENT_NAME << "\n";
-    cout << "Enter для возврата...";
+    cout << "\n=== ГЋ ГЏГђГЋГѓГђГЂГЊГЊГ… ===\n";
+    cout << "ГЌГ Г§ГўГ Г­ГЁГҐ: Г‚ГҐГ±ГҐГ«Г Гї ГґГҐГ°Г¬Г \n";
+    cout << "Г‚ГҐГ°Г±ГЁГї: " << PROGRAM_VERSION << "\n";
+    cout << "Г‘ГІГіГ¤ГҐГ­ГІ: " << STUDENT_NAME << "\n";
+    cout << "Enter Г¤Г«Гї ГўГ®Г§ГўГ°Г ГІГ ...";
     clearInput(); cin.get();
 }
 
 void showMainMenu()
 {
     cout << "\n******************************\n";
-    cout << "*        ВЕСЕЛАЯ ФЕРМА       *\n";
+    cout << "*        Г‚Г…Г‘Г…Г‹ГЂГџ Г”Г…ГђГЊГЂ       *\n";
     cout << "******************************\n";
-    cout << MENU_START_GAME << ". Начать игру\n";
-    cout << MENU_LOAD_GAME << ". Загрузить игру\n";
-    cout << MENU_SETTINGS << ". Настройки\n";
-    cout << MENU_ABOUT << ". О программе\n";
-    cout << MENU_EXIT << ". Выход\n";
-    cout << "Выберите пункт меню: ";
+    cout << MENU_START_GAME << ". ГЌГ Г·Г ГІГј ГЁГЈГ°Гі\n";
+    cout << MENU_LOAD_GAME << ". Г‡Г ГЈГ°ГіГ§ГЁГІГј ГЁГЈГ°Гі\n";
+    cout << MENU_SETTINGS << ". ГЌГ Г±ГІГ°Г®Г©ГЄГЁ\n";
+    cout << MENU_ABOUT << ". ГЋ ГЇГ°Г®ГЈГ°Г Г¬Г¬ГҐ\n";
+    cout << MENU_EXIT << ". Г‚Г»ГµГ®Г¤\n";
+    cout << "Г‚Г»ГЎГҐГ°ГЁГІГҐ ГЇГіГ­ГЄГІ Г¬ГҐГ­Гѕ: ";
 }
 
 // ==================== MAIN ====================
@@ -767,7 +766,7 @@ int main()
 
         int c;
         cin >> c;
-        if (cin.fail()) { clearInput(); cout << "Ошибка ввода!\n"; continue; }
+        if (cin.fail()) { clearInput(); cout << "ГЋГёГЁГЎГЄГ  ГўГўГ®Г¤Г !\n"; continue; }
 
         switch (c)
         {
@@ -776,10 +775,10 @@ int main()
         case MENU_SETTINGS:   settingsMenu();    break;
         case MENU_ABOUT:      aboutProgram();    break;
         case MENU_EXIT:
-            cout << "До свидания!\n";
+            cout << "Г„Г® Г±ГўГЁГ¤Г Г­ГЁГї!\n";
             return 0;
         default:
-            cout << "Неверный пункт!\n";
+            cout << "ГЌГҐГўГҐГ°Г­Г»Г© ГЇГіГ­ГЄГІ!\n";
         }
     }
 }
