@@ -25,7 +25,7 @@ echo -e "${YELLOW}>>> Сборка тестов (test.cpp -> tests)...${NC}"
 
 g++ -std=c++17 -Wall -Wextra -O2 \
     -finput-charset=UTF-8 -fexec-charset=UTF-8 \
-    tests/test.cpp -o tests
+    tests/test.cpp -o test_bin
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Ошибка сборки test.cpp!${NC}"
