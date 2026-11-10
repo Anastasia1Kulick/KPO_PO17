@@ -284,6 +284,8 @@ void setupLocale()
 
 void clearInput()
 {
+    if (cin.eof()) exit(0);
+    cin.clear();
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
