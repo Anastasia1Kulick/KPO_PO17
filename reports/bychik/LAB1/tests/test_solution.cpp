@@ -142,8 +142,10 @@ void test_persistence() {
 }
 
 int main() {
+#ifdef _WIN32
     SetConsoleOutputCP(1251);
     setlocale(LC_ALL, "Russian");
+#endif
 
     cout << "=== Модульные тесты ===\n\n";
 
@@ -161,10 +163,6 @@ int main() {
     cout << "\n============================\n";
     cout << "Пройдено: " << testsPassed << " / " << testsRun << "\n";
     cout << "============================\n";
-
-    cout << "\nНажмите Enter для выхода...";
-    cin.get();
-    cin.get();
-
+  
     return (testsPassed == testsRun) ? 0 : 1;
 }
