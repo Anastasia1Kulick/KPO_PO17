@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-cd "$(dirname "$0")"
-g++ -std=c++17 -O2 -o lab3 lab3.cpp
-g++ -std=c++17 -O2 -o test3 test3.cpp
-./test3 ./lab3
+
+g++ -std=c++17 -O2 -o /tmp/lab3 src/lab3.cpp
+g++ -std=c++17 -O2 -o /tmp/test3 tests/test3.cpp
+
+/tmp/test3 /tmp/lab3
