@@ -237,7 +237,7 @@ void testIncome()
 {
     removeSettings();
     runProgram("3\n1\n1\n4\n4\n5\n"); // Easy, money 2000
-    string output = runProgram("1\n2\n2\n5\n");
+    string output = runProgram("1\n5\n");
 
     // After first day income should be added to 2000
     // Cows: 2 * (15*50/100=7) = 14
