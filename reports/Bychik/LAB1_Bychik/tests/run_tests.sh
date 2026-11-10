@@ -3,7 +3,7 @@
 set -u
 
 # ---------- Настройки ----------
-SRC="../кпо1.26.cpp"
+SRC="../main.cpp"
 BIN="./game_test"
 BUILD_LOG="build.log"
 
