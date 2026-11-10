@@ -50,7 +50,7 @@ for lab_dir in "$@"; do
   echo "### \`$lab_dir\`"
   echo
 
-  runner="$lab_dir/tests/run_tests.sh"
+  runner="$lab_dir/run_tests.sh"
 
   if [[ ! -f "$runner" ]]; then
     if [[ "$REQUIRE_TESTS" == "true" ]]; then
@@ -66,7 +66,7 @@ for lab_dir in "$@"; do
   chmod +x "$runner"
   output_file="$(mktemp)"
 
-  if ( cd "$lab_dir" && timeout "${TIMEOUT_SECONDS}s" bash "tests/run_tests.sh" ) > "$output_file" 2>&1; then
+  if ( cd "$lab_dir" && timeout "${TIMEOUT_SECONDS}s" bash "test.sh" ) > "$output_file" 2>&1; then
     status="✅ Тесты прошли."
   else
     exit_code=$?
