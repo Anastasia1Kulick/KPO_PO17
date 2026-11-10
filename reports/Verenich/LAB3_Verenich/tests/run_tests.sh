@@ -14,7 +14,7 @@ echo -e "${YELLOW}>>> Сборка основной программы (main.cpp
 
 # Флаги -finput-charset и -fexec-charset гарантируют правильную работу с UTF-8 (русский язык)
 g++ -std=c++17 -Wall -Wextra -O2 \
-    -finput-charset=UTF-8 -fexec-charset=UTF-8 ../src/main.cpp -o farm
+    -finput-charset=UTF-8 -fexec-charset=UTF-8 src/main.cpp -o farm
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Ошибка сборки main.cpp!${NC}"
