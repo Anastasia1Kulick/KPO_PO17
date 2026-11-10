@@ -13,7 +13,6 @@
 
 using namespace std;
 
-// ==================== жберю дкъ бшбндю ====================
 const string GREEN = "\033[0;32m";
 const string RED = "\033[0;31m";
 const string YELLOW = "\033[1;33m";
