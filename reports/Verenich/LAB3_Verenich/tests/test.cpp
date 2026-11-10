@@ -19,13 +19,13 @@ const string YELLOW = "\033[1;33m";
 const string BLUE = "\033[0;34m";
 const string NC = "\033[0m";
 
-// ==================== СЧЁТЧИКИ ====================
+// ==================== COUNTERS ====================
 int passed = 0, failed = 0, total = 0;
 
 const string BINARY = "./farm";
 const string SETTINGS_FILE = "settings.txt";
 
-// ==================== НАСТРОЙКА ЛОКАЛИ ====================
+// ==================== LOCALE SETUP ====================
 void setupLocale()
 {
 #ifdef _WIN32
@@ -37,9 +37,9 @@ void setupLocale()
 #endif
 }
 
-// ==================== УТИЛИТЫ ====================
+// ==================== UTILITIES ====================
 
-// Запуск основной программы с заданным вводом (симуляция действий пользователя)
+// Run the main program with given input (simulating user actions)
 string runProgram(const string& input)
 {
     string inputFile = "test_input.tmp";
@@ -62,13 +62,13 @@ string runProgram(const string& input)
     return ss.str();
 }
 
-// Проверка наличия подстроки в тексте
+// Check if text contains a substring
 bool contains(const string& text, const string& sub)
 {
     return text.find(sub) != string::npos;
 }
 
-// Вывод результата теста
+// Print test result
 void printResult(const string& name, bool ok)
 {
     total++;
@@ -84,13 +84,13 @@ void printResult(const string& name, bool ok)
     }
 }
 
-// Удаление файла настроек перед тестом
+// Remove settings file before test
 void removeSettings()
 {
     remove(SETTINGS_FILE.c_str());
 }
 
-// Проверка существования исполняемого файла игры
+// Check if game executable exists
 bool checkBinaryExists()
 {
     ifstream c(BINARY);
@@ -99,21 +99,21 @@ bool checkBinaryExists()
     return ok;
 }
 
-// ==================== ТЕСТЫ (ЛР №3) ====================
+// ==================== TESTS (LAB #3) ====================
 
-// Тест 1: Запуск игры — отображается день, деньги, действия
+// Test 1: Start game — day, money, actions are displayed
 void testStartGameShowsState()
 {
     removeSettings();
-    runProgram("5\n"); // создаём файл настроек по умолчанию
-    string output = runProgram("1\n\n\n2\n5\n"); // зашли в игру, завершили день, вышли
-    bool ok = contains(output, "День:") &&
-        contains(output, "Деньги:") &&
-        contains(output, "Действий:");
-    printResult("Тест 1: Запуск игры — состояние игрока", ok);
+    runProgram("5\n"); // create default settings file
+    string output = runProgram("1\n\n\n2\n5\n"); // enter game, end day, exit
+    bool ok = contains(output, "Day:") &&
+        contains(output, "Money:") &&
+        contains(output, "Actions:");
+    printResult("Test 1: Start game — player state", ok);
 }
 
-// Тест 2: На старте есть животные из настроек (Cows, Chickens)
+// Test 2: Starting animals from settings are present (Cows, Chickens)
 void testStartGameHasAnimals()
 {
     removeSettings();
@@ -121,167 +121,167 @@ void testStartGameHasAnimals()
     string output = runProgram("1\n\n\n2\n5\n");
     bool ok = contains(output, "Cows") &&
         contains(output, "Chickens");
-    printResult("Тест 2: Стартовые животные из settings", ok);
+    printResult("Test 2: Starting animals from settings", ok);
 }
 
-// Тест 3: Действий в день зависит от сложности (Easy = 5)
+// Test 3: Actions per day depends on difficulty (Easy = 5)
 void testActionsEasy()
 {
     removeSettings();
-    runProgram("3\n1\n1\n4\n4\n5\n"); // Устанавливаем Easy
+    runProgram("3\n1\n1\n4\n4\n5\n"); // Set Easy
     string output = runProgram("1\n\n\n2\n5\n");
-    printResult("Тест 3: Easy — 5 действий в день",
-        contains(output, "Действий: 5"));
+    printResult("Test 3: Easy — 5 actions per day",
+        contains(output, "Actions: 5"));
 }
 
-// Тест 4: Действий в день зависит от сложности (Hard = 3)
+// Test 4: Actions per day depends on difficulty (Hard = 3)
 void testActionsHard()
 {
     removeSettings();
-    runProgram("3\n1\n3\n4\n4\n5\n"); // Устанавливаем Hard
+    runProgram("3\n1\n3\n4\n4\n5\n"); // Set Hard
     string output = runProgram("1\n\n\n2\n5\n");
-    printResult("Тест 4: Hard — 3 действия в день",
-        contains(output, "Действий: 3"));
+    printResult("Test 4: Hard — 3 actions per day",
+        contains(output, "Actions: 3"));
 }
 
-// Тест 5: Деньги зависят от сложности (Easy = 2000)
+// Test 5: Money depends on difficulty (Easy = 2000)
 void testMoneyEasy()
 {
     removeSettings();
     runProgram("3\n1\n1\n4\n4\n5\n");
     string output = runProgram("1\n\n\n2\n5\n");
-    printResult("Тест 5: Easy — 2000 денег",
-        contains(output, "Деньги: 2000"));
+    printResult("Test 5: Easy — 2000 money",
+        contains(output, "Money: 2000"));
 }
 
-// Тест 6: Деньги зависят от сложности (Hard = 500)
+// Test 6: Money depends on difficulty (Hard = 500)
 void testMoneyHard()
 {
     removeSettings();
     runProgram("3\n1\n3\n4\n4\n5\n");
     string output = runProgram("1\n\n\n2\n5\n");
-    printResult("Тест 6: Hard — 500 денег",
-        contains(output, "Деньги: 500"));
+    printResult("Test 6: Hard — 500 money",
+        contains(output, "Money: 500"));
 }
 
-// Тест 7: Отображается меню дня (4 действия)
+// Test 7: Day menu is displayed (4 actions)
 void testDayMenu()
 {
     removeSettings();
     runProgram("5\n");
     string output = runProgram("1\n\n\n2\n5\n");
-    bool ok = contains(output, "Покормить") &&
-        contains(output, "Позаботиться") &&
-        contains(output, "Купить еду") &&
-        contains(output, "Купить животное");
-    printResult("Тест 7: Меню дня со всеми действиями", ok);
+    bool ok = contains(output, "Feed") &&
+        contains(output, "Care") &&
+        contains(output, "Buy food") &&
+        contains(output, "Buy an animal");
+    printResult("Test 7: Day menu with all actions", ok);
 }
 
-// Тест 8: Кормление животного (есть еда на складе)
+// Test 8: Feeding an animal (food available in stock)
 void testFeedAnimal()
 {
     removeSettings();
     runProgram("5\n");
-    // Игра -> кормить -> 1-е животное -> завершить день -> выйти
+    // Game -> feed -> 1st animal -> end day -> exit
     string output = runProgram("1\n1\n1\n2\n2\n5\n");
-    printResult("Тест 8: Кормление животного",
-        contains(output, "покормлено"));
+    printResult("Test 8: Feeding an animal",
+        contains(output, "fed"));
 }
 
-// Тест 9: Забота о животном
+// Test 9: Caring for an animal
 void testCareAnimal()
 {
     removeSettings();
     runProgram("5\n");
-    // Игра -> забота -> 1-е животное -> завершить день -> выйти
+    // Game -> care -> 1st animal -> end day -> exit
     string output = runProgram("1\n2\n1\n2\n2\n5\n");
-    printResult("Тест 9: Забота о животном",
-        contains(output, "обласкано"));
+    printResult("Test 9: Caring for an animal",
+        contains(output, "cared for"));
 }
 
-// Тест 10: Покупка еды (Easy — денег хватает)
+// Test 10: Buying food (Easy — enough money)
 void testBuyFood()
 {
     removeSettings();
     runProgram("3\n1\n1\n4\n4\n5\n"); // Easy
-    // Игра -> купить еду -> 1 (Hay) -> 10 шт -> завершить день -> выйти
+    // Game -> buy food -> 1 (Hay) -> 10 pcs -> end day -> exit
     string output = runProgram("1\n3\n1\n10\n2\n2\n5\n");
-    printResult("Тест 10: Покупка еды",
-        contains(output, "Куплено 10"));
+    printResult("Test 10: Buying food",
+        contains(output, "Bought 10"));
 }
 
-// Тест 11: Покупка животного
+// Test 11: Buying an animal
 void testBuyAnimal()
 {
     removeSettings();
     runProgram("3\n1\n1\n4\n4\n5\n"); // Easy
-    // Игра -> купить животное -> 1 (Cows) -> завершить день -> выйти
+    // Game -> buy animal -> 1 (Cows) -> end day -> exit
     string output = runProgram("1\n4\n1\n2\n2\n5\n");
-    printResult("Тест 11: Покупка животного",
-        contains(output, "Куплено"));
+    printResult("Test 11: Buying an animal",
+        contains(output, "Bought"));
 }
 
-// Тест 12: Завершение дня — увеличивает номер дня
+// Test 12: Ending day — increases day number
 void testEndDay()
 {
     removeSettings();
     runProgram("5\n");
-    // Игра -> завершить день -> выйти
+    // Game -> end day -> exit
     string output = runProgram("1\n2\n2\n5\n");
-    printResult("Тест 12: Завершение дня увеличивает день",
-        contains(output, "День: 2"));
+    printResult("Test 12: Ending day increases day",
+        contains(output, "Day: 2"));
 }
 
-// Тест 13: Доход от животных начисляется (деньги растут)
+// Test 13: Income from animals is credited (money grows)
 void testIncome()
 {
     removeSettings();
-    runProgram("3\n1\n1\n4\n4\n5\n"); // Easy, денег 2000
+    runProgram("3\n1\n1\n4\n4\n5\n"); // Easy, money 2000
     string output = runProgram("1\n2\n2\n5\n");
 
-    // После первого дня доход должен добавиться к 2000
+    // After first day income should be added to 2000
     // Cows: 2 * (15*50/100=7) = 14
     // Chickens: 3 * (5*50/100=2) = 6
-    // Итого: 2020
-    printResult("Тест 13: Доход начисляется (деньги растут)",
-        contains(output, "Деньги: 2020"));
+    // Total: 2020
+    printResult("Test 13: Income is credited (money grows)",
+        contains(output, "Money: 2020"));
 }
 
-// Тест 14: Нет действий — программа требует завершить день
+// Test 14: No actions left — program requires ending day
 void testNoActionsLeft()
 {
     removeSettings();
-    runProgram("3\n1\n3\n4\n4\n5\n"); // Hard: 3 действия
-    // Тратим 3 действия на заботу -> дальше должно выскочить предупреждение
+    runProgram("3\n1\n3\n4\n4\n5\n"); // Hard: 3 actions
+    // Spend 3 actions on care -> warning should appear
     string output = runProgram("1\n"
-        "2\n1\n2\n1\n2\n1\n" // 3 заботы
-        "1\n"                // завершить день
-        "2\n5\n");           // выйти
-    printResult("Тест 14: При окончании действий — завершение дня",
-        contains(output, "Действия на сегодня закончились"));
+        "2\n1\n2\n1\n2\n1\n" // 3 cares
+        "1\n"                // end day
+        "2\n5\n");           // exit
+    printResult("Test 14: When actions run out — end day required",
+        contains(output, "No actions left for today"));
 }
 
-// Тест 15: При выборе 5 (выход из игры) — возврат в главное меню
+// Test 15: Choosing 5 (exit game) — return to main menu
 void testExitFromGame()
 {
     removeSettings();
     runProgram("5\n");
     string output = runProgram("1\n5\n5\n");
-    printResult("Тест 15: Выход из игры в главное меню",
-        contains(output, "ВЕСЕЛАЯ ФЕРМА"));
+    printResult("Test 15: Exit game to main menu",
+        contains(output, "HAPPY FARM"));
 }
 
-// Тест 16: Игра работает и на Hard (3 действия)
+// Test 16: Game works on Hard (3 actions)
 void testGameHard()
 {
     removeSettings();
     runProgram("3\n1\n3\n4\n4\n5\n");
     string output = runProgram("1\n"
-        "1\n1\n1\n1\n1\n1\n" // 3 попытки кормления
-        "2\n2\n5\n");        // завершить и выйти
-    bool ok = contains(output, "День:") &&
-        contains(output, "Действий: 3");
-    printResult("Тест 16: Игра на Hard работает", ok);
+        "1\n1\n1\n1\n1\n1\n" // 3 feeding attempts
+        "2\n2\n5\n");        // end and exit
+    bool ok = contains(output, "Day:") &&
+        contains(output, "Actions: 3");
+    printResult("Test 16: Game works on Hard", ok);
 }
 
 // ==================== MAIN ====================
@@ -291,21 +291,21 @@ int main()
     setupLocale();
 
     cout << BLUE << "============================================\n" << NC;
-    cout << BLUE << "  Тесты: Веселая ферма v3.0\n" << NC;
-    cout << BLUE << "  (ЛР №3: игровая логика)\n" << NC;
+    cout << BLUE << "  Tests: Happy Farm v3.0\n" << NC;
+    cout << BLUE << "  (Lab #3: game logic)\n" << NC;
     cout << BLUE << "============================================\n\n" << NC;
 
     if (!checkBinaryExists())
     {
-        cout << RED << "Бинарник " << BINARY << " не найден!\n" << NC;
-        cout << "Сначала соберите программу:\n";
+        cout << RED << "Binary " << BINARY << " not found!\n" << NC;
+        cout << "First build the program:\n";
         cout << "  g++ -std=c++17 main.cpp -o farm\n";
         return 1;
     }
 
-    cout << YELLOW << ">>> Запуск тестов...\n\n" << NC;
+    cout << YELLOW << ">>> Running tests...\n\n" << NC;
 
-    // Запуск всех тестов
+    // Run all tests
     testStartGameShowsState();
     testStartGameHasAnimals();
     testActionsEasy();
@@ -323,21 +323,21 @@ int main()
     testExitFromGame();
     testGameHard();
 
-    // Итоговый отчёт
+    // Final report
     cout << "\n";
     cout << BLUE << "============================================\n" << NC;
-    cout << BLUE << "  ИТОГОВЫЙ ОТЧЁТ\n" << NC;
+    cout << BLUE << "  FINAL REPORT\n" << NC;
     cout << BLUE << "============================================\n" << NC;
-    cout << "Всего:    " << total << "\n";
-    cout << GREEN << "Пройдено: " << passed << NC << "\n";
-    cout << RED << "Провалено:" << failed << NC << "\n";
+    cout << "Total:   " << total << "\n";
+    cout << GREEN << "Passed:  " << passed << NC << "\n";
+    cout << RED << "Failed:  " << failed << NC << "\n";
 
     if (failed == 0)
     {
-        cout << GREEN << ">>> ВСЕ ТЕСТЫ ПРОЙДЕНЫ! <<<\n" << NC;
+        cout << GREEN << ">>> ALL TESTS PASSED! <<<\n" << NC;
         return 0;
     }
 
-    cout << RED << ">>> ЕСТЬ ПРОВАЛЫ <<<\n" << NC;
+    cout << RED << ">>> SOME TESTS FAILED <<<\n" << NC;
     return 1;
 }

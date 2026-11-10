@@ -15,42 +15,43 @@
 
 using namespace std;
 
+// ==================== MAIN MENU CONSTANTS ====================
 const int MENU_START_GAME = 1;
 const int MENU_LOAD_GAME = 2;
 const int MENU_SETTINGS = 3;
 const int MENU_ABOUT = 4;
 const int MENU_EXIT = 5;
 
-// ==================== ÊÎÍÑÒÀÍÒÛ ÏÎÄÌÅÍÞ ÍÀÑÒÐÎÅÊ ====================
+// ==================== SETTINGS SUBMENU CONSTANTS ====================
 const int SET_DIFFICULTY = 1;
 const int SET_ANIMALS = 2;
 const int SET_ADD_ANIMAL = 3;
 const int SET_BACK = 4;
 
-// ==================== ÊÎÍÑÒÀÍÒÛ ÏÎÄÌÅÍÞ ÆÈÂÎÒÍÛÕ ====================
+// ==================== ANIMALS SUBMENU CONSTANTS ====================
 const int ANIMAL_EDIT = 1;
 const int ANIMAL_DELETE = 2;
 const int ANIMAL_BACK = 3;
 
 const int DIFF_COUNT = 3;
 
-// ==================== ÊÎÍÑÒÀÍÒÛ ÈÃÐÎÂÎÃÎ ÏÐÎÖÅÑÑÀ ====================
+// ==================== GAME PROCESS CONSTANTS ====================
 const int ACTION_FEED = 1;
 const int ACTION_CARE = 2;
 const int ACTION_BUY_FOOD = 3;
 const int ACTION_BUY_ANIMAL = 4;
 const int ACTION_END_DAY = 5;
 
-// ==================== ÂÅÐÑÈß ÏÐÎÃÐÀÌÌÛ ====================
+// ==================== PROGRAM VERSION ====================
 const string PROGRAM_VERSION = "3.0";
 const string STUDENT_NAME = "Viarenich Daniil";
 const string SETTINGS_FILE = "settings.txt";
 
-// ==================== ÃËÎÁÀËÜÍÛÅ ÍÀÑÒÐÎÉÊÈ ====================
+// ==================== GLOBAL SETTINGS ====================
 string difficulty = "Medium";
 map<string, int> startingAnimals;
 
-// ==================== ÊËÀÑÑ FOOD ====================
+// ==================== CLASS FOOD ====================
 class Food
 {
 private:
@@ -67,7 +68,7 @@ public:
     int    getNutrition() const { return nutrition; }
 };
 
-// ==================== ÊËÀÑÑ ANIMAL ====================
+// ==================== CLASS ANIMAL ====================
 class Animal
 {
 private:
@@ -92,7 +93,7 @@ public:
         foodType(food), buyPrice(buyP), income(inc) {
     }
 
-    // --- Ãåòòåðû ---
+    // --- Getters ---
     string getType()      const { return type; }
     string getName()      const { return name; }
     int    getHunger()    const { return hunger; }
@@ -104,21 +105,21 @@ public:
 
     bool isAlive() const { return health > 0; }
 
-    // Êîðìëåíèå
+    // Feeding
     void feed(int nutrition)
     {
         hunger = max(0, hunger - nutrition);
         if (hunger < 20) happiness = min(100, happiness + 5);
     }
 
-    // Çàáîòà
+    // Care
     void care()
     {
         happiness = min(100, happiness + 10);
         health = min(100, health + 5);
     }
 
-    // Åæåäíåâíîå îáíîâëåíèå
+    // Daily update
     void dailyUpdate()
     {
         hunger = min(100, hunger + 20);
@@ -130,7 +131,7 @@ public:
         if (health == 0) happiness = 0;
     }
 
-    // Äîõîä çà äåíü
+    // Daily income
     int dailyIncome() const
     {
         if (health <= 0) return 0;
@@ -138,7 +139,7 @@ public:
     }
 };
 
-// ==================== ÊËÀÑÑ PLAYER ====================
+// ==================== CLASS PLAYER ====================
 class Player
 {
 private:
@@ -157,7 +158,7 @@ public:
     const vector<Animal>& getAnimals() const { return animals; }
     const map<string, int>& getFoodStock() const { return foodStock; }
 
-    // Èíèöèàëèçàöèÿ èç íàñòðîåê
+    // Initialization from settings
     void initFromSettings(const map<string, int>& startAnimals,
         int startMoney, int actionsPerDay)
     {
@@ -181,7 +182,7 @@ public:
         foodStock["Swill"] = 5;
     }
 
-    // Ñîçäàíèå æèâîòíîãî ïî òèïó
+    // Create animal by type
     static Animal createAnimalByType(const string& type, int id)
     {
         string name = type + "_" + to_string(id);
@@ -195,7 +196,7 @@ public:
         return Animal(type, name, "Hay", 60, 7);
     }
 
-    // --- Äåéñòâèÿ ---
+    // --- Actions ---
 
     bool feedAnimal(int index, int nutrition)
     {
@@ -270,7 +271,7 @@ public:
     void resetActions(int perDay) { actionsLeft = perDay; }
 };
 
-// ==================== ÂÑÏÎÌÎÃÀÒÅËÜÍÛÅ ÔÓÍÊÖÈÈ ====================
+// ==================== HELPER FUNCTIONS ====================
 void setupLocale()
 {
 #ifdef _WIN32
@@ -309,7 +310,7 @@ int startMoney()
     return 1000;
 }
 
-// ==================== ÔÀÉËÎÂÛÅ ÔÓÍÊÖÈÈ ====================
+// ==================== FILE FUNCTIONS ====================
 void setDefaults()
 {
     difficulty = "Medium";
@@ -373,26 +374,26 @@ void initSettings()
 {
     if (!loadSettings())
     {
-        cout << "Ôàéë íàñòðîåê íå íàéäåí. Ñîçäàíû ïî óìîë÷àíèþ.\n";
+        cout << "Settings file not found. Defaults created.\n";
         setDefaults();
         saveSettings();
     }
 }
 
-// ==================== ÈÃÐÎÂÎÉ ÏÐÎÖÅÑÑ ====================
+// ==================== GAME PROCESS ====================
 
 void printGameState(const Player& p)
 {
     cout << "\n+---------------------------------------+\n";
-    cout << "| Äåíü: " << p.getDay()
-        << " | Äåíüãè: " << p.getMoney()
-        << " | Äåéñòâèé: " << p.getActionsLeft() << "\n";
+    cout << "| Day: " << p.getDay()
+        << " | Money: " << p.getMoney()
+        << " | Actions: " << p.getActionsLeft() << "\n";
     cout << "+---------------------------------------+\n";
 
-    cout << "Æèâîòíûå (" << p.getAnimals().size() << "):\n";
+    cout << "Animals (" << p.getAnimals().size() << "):\n";
     if (p.getAnimals().empty())
     {
-        cout << "  (íåò æèâîòíûõ)\n";
+        cout << "  (no animals)\n";
     }
     else
     {
@@ -400,15 +401,15 @@ void printGameState(const Player& p)
         for (const auto& a : p.getAnimals())
         {
             cout << "  " << i++ << ". " << a.getType()
-                << " \"" << a.getName() << "\"  "
-                << "ãîëîä:" << a.getHunger()
-                << " ñ÷àñòüå:" << a.getHappiness()
-                << " çäîðîâüå:" << a.getHealth() << "\n";
+                << " \"" << a.getName() << "\" — "
+                << "hunger:" << a.getHunger()
+                << " happiness:" << a.getHappiness()
+                << " health:" << a.getHealth() << "\n";
         }
     }
 
-    cout << "Åäà: ";
-    if (p.getFoodStock().empty()) cout << "(íåò)";
+    cout << "Food: ";
+    if (p.getFoodStock().empty()) cout << "(none)";
     else for (const auto& f : p.getFoodStock())
         cout << f.first << "=" << f.second << " ";
     cout << "\n";
@@ -436,17 +437,17 @@ vector<Animal> animalCatalog()
 
 void actionFeed(Player& p)
 {
-    if (p.getAnimals().empty()) { cout << "Íåò æèâîòíûõ.\n"; return; }
+    if (p.getAnimals().empty()) { cout << "No animals.\n"; return; }
 
-    cout << "Âûáåðèòå æèâîòíîå äëÿ êîðìëåíèÿ:\n";
+    cout << "Choose an animal to feed:\n";
     int i = 1;
     for (const auto& a : p.getAnimals())
     {
         cout << "  " << i++ << ". " << a.getType()
-            << " \"" << a.getName() << "\" (åñò " << a.getFoodType()
-            << ", ãîëîä " << a.getHunger() << ")\n";
+            << " \"" << a.getName() << "\" (eats " << a.getFoodType()
+            << ", hunger " << a.getHunger() << ")\n";
     }
-    cout << "Íîìåð (0  îòìåíà): ";
+    cout << "Number (0 — cancel): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)p.getAnimals().size()) return;
@@ -457,7 +458,7 @@ void actionFeed(Player& p)
 
     if (stock <= 0)
     {
-        cout << "Íåò åäû \"" << food << "\" íà ñêëàäå!\n";
+        cout << "No food \"" << food << "\" in stock!\n";
         return;
     }
 
@@ -466,71 +467,71 @@ void actionFeed(Player& p)
         if (f.getName() == food) { nutrition = f.getNutrition(); break; }
 
     if (p.feedAnimal(idx - 1, nutrition))
-        cout << "Æèâîòíîå ïîêîðìëåíî.\n";
+        cout << "Animal fed.\n";
     else
-        cout << "Íå óäàëîñü ïîêîðìèòü.\n";
+        cout << "Failed to feed.\n";
 }
 
 void actionCare(Player& p)
 {
-    if (p.getAnimals().empty()) { cout << "Íåò æèâîòíûõ.\n"; return; }
+    if (p.getAnimals().empty()) { cout << "No animals.\n"; return; }
 
-    cout << "Âûáåðèòå æèâîòíîå äëÿ çàáîòû:\n";
+    cout << "Choose an animal to care for:\n";
     int i = 1;
     for (const auto& a : p.getAnimals())
         cout << "  " << i++ << ". " << a.getType() << " \"" << a.getName() << "\"\n";
-    cout << "Íîìåð (0  îòìåíà): ";
+    cout << "Number (0 — cancel): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)p.getAnimals().size()) return;
 
     if (p.careAnimal(idx - 1))
-        cout << "Æèâîòíîå îáëàñêàíî.\n";
+        cout << "Animal cared for.\n";
     else
-        cout << "Íåò äåéñòâèé!\n";
+        cout << "No actions left!\n";
 }
 
 void actionBuyFood(Player& p)
 {
     auto catalog = foodCatalog();
-    cout << "Ìàãàçèí åäû:\n";
+    cout << "Food shop:\n";
     int i = 1;
     for (const auto& f : catalog)
     {
         cout << "  " << i++ << ". " << f.getName()
-            << "  öåíà " << f.getPrice()
-            << ", ïèòàòåëüíîñòü " << f.getNutrition() << "\n";
+            << " — price " << f.getPrice()
+            << ", nutrition " << f.getNutrition() << "\n";
     }
-    cout << "Íîìåð (0  îòìåíà): ";
+    cout << "Number (0 — cancel): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)catalog.size()) return;
 
     const Food& f = catalog[idx - 1];
-    cout << "Ñêîëüêî êóïèòü? ";
+    cout << "How much to buy? ";
     int amount; cin >> amount;
     if (cin.fail()) { clearInput(); return; }
     if (amount <= 0) return;
 
     if (p.buyFood(f.getName(), f.getPrice(), amount))
-        cout << "Êóïëåíî " << amount << " x " << f.getName() << "\n";
+        cout << "Bought " << amount << " x " << f.getName() << "\n";
     else
-        cout << "Íåäîñòàòî÷íî äåíåã èëè äåéñòâèé!\n";
+        cout << "Not enough money or actions!\n";
 }
 
 void actionBuyAnimal(Player& p)
 {
     auto catalog = animalCatalog();
-    cout << "Ìàãàçèí æèâîòíûõ:\n";
+    cout << "Animal shop:\n";
     int i = 1;
     for (const auto& a : catalog)
     {
         cout << "  " << i++ << ". " << a.getType()
-            << "  öåíà " << a.getBuyPrice()
-            << ", åñò " << a.getFoodType()
-            << ", äîõîä " << a.getIncome() << "/äåíü\n";
+            << " — price " << a.getBuyPrice()
+            << ", eats " << a.getFoodType()
+            << ", income " << a.getIncome() << "/day\n";
     }
-    cout << "Íîìåð (0  îòìåíà): ";
+    cout << "Number (0 — cancel): ";
     int idx; cin >> idx;
     if (cin.fail()) { clearInput(); return; }
     if (idx < 1 || idx >(int)catalog.size()) return;
@@ -540,21 +541,21 @@ void actionBuyAnimal(Player& p)
     Animal fresh = Player::createAnimalByType(chosen.getType(), id);
 
     if (p.buyAnimal(fresh))
-        cout << "Êóïëåíî: " << fresh.getType() << " \"" << fresh.getName() << "\"\n";
+        cout << "Bought: " << fresh.getType() << " \"" << fresh.getName() << "\"\n";
     else
-        cout << "Íåäîñòàòî÷íî äåíåã èëè äåéñòâèé!\n";
+        cout << "Not enough money or actions!\n";
 }
 
-// Ãëàâíûé öèêë èãðû
+// Main game loop
 void startGame()
 {
     Player player;
     player.initFromSettings(startingAnimals, startMoney(), actionsPerDay());
 
-    cout << "\n=== ÍÀ×ÀËÎ ÈÃÐÛ ===\n";
-    cout << "Ñëîæíîñòü: " << difficulty << "\n";
-    cout << "Íà÷àëüíûå äåíüãè: " << player.getMoney() << "\n";
-    cout << "Äåéñòâèé â äåíü: " << player.getActionsLeft() << "\n";
+    cout << "\n=== GAME START ===\n";
+    cout << "Difficulty: " << difficulty << "\n";
+    cout << "Starting money: " << player.getMoney() << "\n";
+    cout << "Actions per day: " << player.getActionsLeft() << "\n";
 
     while (true)
     {
@@ -562,10 +563,10 @@ void startGame()
 
         if (player.getActionsLeft() <= 0)
         {
-            cout << "\nÄåéñòâèÿ íà ñåãîäíÿ çàêîí÷èëèñü.\n";
-            cout << "1. Çàâåðøèòü äåíü\n";
-            cout << "2. Âûéòè â ãëàâíîå ìåíþ\n";
-            cout << "Âûáîð: ";
+            cout << "\nNo actions left for today.\n";
+            cout << "1. End day\n";
+            cout << "2. Return to main menu\n";
+            cout << "Choice: ";
             int c; cin >> c;
             if (cin.fail()) { clearInput(); continue; }
 
@@ -573,19 +574,19 @@ void startGame()
             {
                 player.endDay();
                 player.resetActions(actionsPerDay());
-                cout << "--- Äåíü " << player.getDay() << " íà÷àëñÿ ---\n";
+                cout << "--- Day " << player.getDay() << " started ---\n";
             }
             else if (c == 2) return;
             continue;
         }
 
-        cout << "\n--- Ìåíþ äíÿ ---\n";
-        cout << ACTION_FEED << ". Ïîêîðìèòü æèâîòíîå\n";
-        cout << ACTION_CARE << ". Ïîçàáîòèòüñÿ î æèâîòíîì\n";
-        cout << ACTION_BUY_FOOD << ". Êóïèòü åäó\n";
-        cout << ACTION_BUY_ANIMAL << ". Êóïèòü æèâîòíîå\n";
-        cout << ACTION_END_DAY << ". Çàâåðøèòü äåíü\n";
-        cout << "Âûáåðèòå äåéñòâèå: ";
+        cout << "\n--- Day menu ---\n";
+        cout << ACTION_FEED << ". Feed an animal\n";
+        cout << ACTION_CARE << ". Care for an animal\n";
+        cout << ACTION_BUY_FOOD << ". Buy food\n";
+        cout << ACTION_BUY_ANIMAL << ". Buy an animal\n";
+        cout << ACTION_END_DAY << ". End day\n";
+        cout << "Choose an action: ";
 
         int choice;
         cin >> choice;
@@ -600,26 +601,26 @@ void startGame()
         case ACTION_END_DAY:
             player.endDay();
             player.resetActions(actionsPerDay());
-            cout << "--- Äåíü " << player.getDay() << " íà÷àëñÿ ---\n";
+            cout << "--- Day " << player.getDay() << " started ---\n";
             break;
         default:
-            cout << "Íåâåðíûé ïóíêò!\n";
+            cout << "Invalid option!\n";
         }
     }
 }
 
-// ==================== ÏÎÄÌÅÍÞ ÍÀÑÒÐÎÅÊ ====================
+// ==================== SETTINGS SUBMENU ====================
 void difficultySubmenu()
 {
     const string options[DIFF_COUNT] = { "Easy", "Medium", "Hard" };
     while (true)
     {
-        cout << "\n===== ÓÐÎÂÅÍÜ ÑËÎÆÍÎÑÒÈ =====\n";
+        cout << "\n===== DIFFICULTY LEVEL =====\n";
         for (int i = 0; i < DIFF_COUNT; i++)
             cout << (i + 1) << ". " << options[i] << "\n";
-        cout << (DIFF_COUNT + 1) << ". Íàçàä\n";
-        cout << "Òåêóùèé: " << difficulty << "\n";
-        cout << "Âûáåðèòå: ";
+        cout << (DIFF_COUNT + 1) << ". Back\n";
+        cout << "Current: " << difficulty << "\n";
+        cout << "Choose: ";
 
         int c; cin >> c;
         if (cin.fail()) { clearInput(); continue; }
@@ -628,7 +629,7 @@ void difficultySubmenu()
         {
             difficulty = options[c - 1];
             saveSettings();
-            cout << "Óñòàíîâëåíî: " << difficulty << "\n";
+            cout << "Set: " << difficulty << "\n";
         }
         else if (c == DIFF_COUNT + 1) return;
     }
@@ -638,12 +639,12 @@ void animalsSubmenu()
 {
     while (true)
     {
-        cout << "\n===== ÆÈÂÎÒÍÛÅ (ñòàðòîâûå) =====\n";
+        cout << "\n===== ANIMALS (starting) =====\n";
         int i = 1;
         for (const auto& p : startingAnimals)
-            cout << i++ << ". " << p.first << "  " << p.second << "\n";
-        cout << "0. Íàçàä\n";
-        cout << "Âûáåðèòå: ";
+            cout << i++ << ". " << p.first << " — " << p.second << "\n";
+        cout << "0. Back\n";
+        cout << "Choose: ";
 
         int c; cin >> c;
         if (cin.fail()) { clearInput(); continue; }
@@ -657,17 +658,17 @@ void animalsSubmenu()
         while (true)
         {
             cout << "\n--- " << name << " (" << startingAnimals[name] << ") ---\n";
-            cout << ANIMAL_EDIT << ". Èçìåíèòü êîëè÷åñòâî\n";
-            cout << ANIMAL_DELETE << ". Óäàëèòü\n";
-            cout << ANIMAL_BACK << ". Íàçàä\n";
-            cout << "Âûáîð: ";
+            cout << ANIMAL_EDIT << ". Change quantity\n";
+            cout << ANIMAL_DELETE << ". Delete\n";
+            cout << ANIMAL_BACK << ". Back\n";
+            cout << "Choice: ";
 
             int a; cin >> a;
             if (cin.fail()) { clearInput(); continue; }
 
             if (a == ANIMAL_EDIT)
             {
-                cout << "Íîâîå êîëè÷åñòâî (0..1000): ";
+                cout << "New quantity (0..1000): ";
                 int v; cin >> v;
                 if (cin.fail()) { clearInput(); continue; }
                 if (v < 0 || v > 1000) continue;
@@ -687,11 +688,11 @@ void animalsSubmenu()
 
 void addAnimalSubmenu()
 {
-    cout << "Íàçâàíèå æèâîòíîãî: ";
+    cout << "Animal name: ";
     string name; cin >> name;
     if (name.empty() || startingAnimals.count(name)) return;
 
-    cout << "Êîëè÷åñòâî: ";
+    cout << "Quantity: ";
     int c; cin >> c;
     if (cin.fail()) { clearInput(); return; }
     if (c < 0 || c > 1000) return;
@@ -704,12 +705,12 @@ void settingsMenu()
 {
     while (true)
     {
-        cout << "\n===== ÍÀÑÒÐÎÉÊÈ =====\n";
-        cout << SET_DIFFICULTY << ". Ñëîæíîñòü (" << difficulty << ")\n";
-        cout << SET_ANIMALS << ". Æèâîòíûå (" << startingAnimals.size() << ")\n";
-        cout << SET_ADD_ANIMAL << ". Äîáàâèòü æèâîòíîå\n";
-        cout << SET_BACK << ". Íàçàä\n";
-        cout << "Âûáåðèòå: ";
+        cout << "\n===== SETTINGS =====\n";
+        cout << SET_DIFFICULTY << ". Difficulty (" << difficulty << ")\n";
+        cout << SET_ANIMALS << ". Animals (" << startingAnimals.size() << ")\n";
+        cout << SET_ADD_ANIMAL << ". Add animal\n";
+        cout << SET_BACK << ". Back\n";
+        cout << "Choose: ";
 
         int c; cin >> c;
         if (cin.fail()) { clearInput(); continue; }
@@ -724,36 +725,36 @@ void settingsMenu()
     }
 }
 
-// ==================== ÏÐÎ×ÈÅ ÏÓÍÊÒÛ ====================
+// ==================== OTHER ITEMS ====================
 void loadGame()
 {
-    cout << "\n=== ÇÀÃÐÓÇÊÀ ÈÃÐÛ ===\n";
-    cout << "Ôóíêöèÿ ïîêà íåäîñòóïíà.\n";
-    cout << "Enter äëÿ âîçâðàòà...";
+    cout << "\n=== LOAD GAME ===\n";
+    cout << "Feature not available yet.\n";
+    cout << "Enter to return...";
     clearInput(); cin.get();
 }
 
 void aboutProgram()
 {
-    cout << "\n=== Î ÏÐÎÃÐÀÌÌÅ ===\n";
-    cout << "Íàçâàíèå: Âåñåëàÿ ôåðìà\n";
-    cout << "Âåðñèÿ: " << PROGRAM_VERSION << "\n";
-    cout << "Ñòóäåíò: " << STUDENT_NAME << "\n";
-    cout << "Enter äëÿ âîçâðàòà...";
+    cout << "\n=== ABOUT PROGRAM ===\n";
+    cout << "Name: Happy Farm\n";
+    cout << "Version: " << PROGRAM_VERSION << "\n";
+    cout << "Student: " << STUDENT_NAME << "\n";
+    cout << "Enter to return...";
     clearInput(); cin.get();
 }
 
 void showMainMenu()
 {
     cout << "\n******************************\n";
-    cout << "*        ÂÅÑÅËÀß ÔÅÐÌÀ       *\n";
+    cout << "*        HAPPY FARM          *\n";
     cout << "******************************\n";
-    cout << MENU_START_GAME << ". Íà÷àòü èãðó\n";
-    cout << MENU_LOAD_GAME << ". Çàãðóçèòü èãðó\n";
-    cout << MENU_SETTINGS << ". Íàñòðîéêè\n";
-    cout << MENU_ABOUT << ". Î ïðîãðàììå\n";
-    cout << MENU_EXIT << ". Âûõîä\n";
-    cout << "Âûáåðèòå ïóíêò ìåíþ: ";
+    cout << MENU_START_GAME << ". Start game\n";
+    cout << MENU_LOAD_GAME << ". Load game\n";
+    cout << MENU_SETTINGS << ". Settings\n";
+    cout << MENU_ABOUT << ". About program\n";
+    cout << MENU_EXIT << ". Exit\n";
+    cout << "Choose a menu item: ";
 }
 
 // ==================== MAIN ====================
@@ -768,7 +769,7 @@ int main()
 
         int c;
         cin >> c;
-        if (cin.fail()) { clearInput(); cout << "Îøèáêà ââîäà!\n"; continue; }
+        if (cin.fail()) { clearInput(); cout << "Input error!\n"; continue; }
 
         switch (c)
         {
@@ -777,10 +778,10 @@ int main()
         case MENU_SETTINGS:   settingsMenu();    break;
         case MENU_ABOUT:      aboutProgram();    break;
         case MENU_EXIT:
-            cout << "Äî ñâèäàíèÿ!\n";
+            cout << "Goodbye!\n";
             return 0;
         default:
-            cout << "Íåâåðíûé ïóíêò!\n";
+            cout << "Invalid option!\n";
         }
     }
 }
