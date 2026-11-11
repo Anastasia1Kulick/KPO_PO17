@@ -5,47 +5,63 @@
 
 using namespace std;
 
-const int MENU_START = 1;
-const int MENU_LOAD = 2;
+// Константы главного меню
+const int MENU_START    = 1;
+const int MENU_LOAD     = 2;
 const int MENU_SETTINGS = 3;
-const int MENU_ABOUT = 4;
-const int MENU_EXIT = 5;
+const int MENU_ABOUT    = 4;
+const int MENU_EXIT     = 5;
 
+// Константы меню настроек
 const int SET_SPECIALITY = 1;
-const int SET_NAME = 2;
-const int SET_SUBJECTS = 3;
-const int SET_BACK = 4;
+const int SET_NAME       = 2;
+const int SET_SUBJECTS   = 3;
+const int SET_BACK       = 4;
 
 const string VERSION = "1.0";
 
+// Структура для хранения пользовательских настроек
 struct Settings {
     string speciality = "Программная инженерия";
     string studentName = "Кристина";
     int    subjectsCount = 5;
 };
 
+// Очистка потока ввода при ошибках
 void clearInput() {
     cin.clear();
     cin.ignore(10000, '\n');
 }
 
+// Ожидание нажатия клавиши Enter
 void waitEnter() {
     cout << "\nНажмите Enter, чтобы вернуться в меню...";
     cin.get();
 }
 
-void startGame() {
-    cout << "\n=== Начало игры \"Моя жизнь в университете\" ===\n";
-    cout << "Вы поступаете в университет. Удачи!\n";
+// Пункт меню "О программе"
+void aboutProgram() {
+    cout << "\n=== О программе ===\n";
+    cout << "Версия: " << VERSION << "\n";
+    cout << "Студент: Фамилия Имя\n";
     waitEnter();
 }
 
+// Пункт меню "Загрузить игру"
 void loadGame() {
     cout << "\nФункция загрузки пока недоступна.\n";
     cout << "Она появится в ближайших обновлениях.\n";
     waitEnter();
 }
 
+// Пункт меню "Начать игру"
+void startGame() {
+    cout << "\n=== Начало игры \"Моя жизнь в университете\" ===\n";
+    cout << "Вы поступаете в университет. Удачи!\n";
+    waitEnter();
+}
+
+// Меню настроек
 void settingsMenu(Settings& s) {
     int choice = 0;
     while (choice != SET_BACK) {
@@ -95,14 +111,8 @@ void settingsMenu(Settings& s) {
     }
 }
 
-void aboutProgram() {
-    cout << "\n=== О программе ===\n";
-    cout << "Версия: " << VERSION << "\n";
-    cout << "Студент: Фамилия Имя\n";
-    waitEnter();
-}
-
 int main() {
+    // Настройка кодировки для корректного отображения кириллицы в Windows
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     setlocale(LC_ALL, "Russian");
@@ -126,11 +136,20 @@ int main() {
             continue;
         }
 
+        // Обработка выбора пользователя
         switch (choice) {
-        case MENU_START:    startGame();            break;
-        case MENU_LOAD:     loadGame();             break;
-        case MENU_SETTINGS: settingsMenu(settings); break;
-        case MENU_ABOUT:    aboutProgram();         break;
+        case MENU_START:    
+            startGame();            
+            break;
+        case MENU_LOAD:     
+            loadGame();             
+            break;
+        case MENU_SETTINGS: 
+            settingsMenu(settings); 
+            break;
+        case MENU_ABOUT:    
+            aboutProgram();         
+            break;
         case MENU_EXIT:
             cout << "Выход из программы...\n";
             break;
