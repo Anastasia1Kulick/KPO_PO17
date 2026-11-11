@@ -5,122 +5,148 @@
 
 using namespace std;
 
-// Константы главного меню
-const int MENU_START    = 1;
-const int MENU_LOAD     = 2;
-const int MENU_SETTINGS = 3;
-const int MENU_ABOUT    = 4;
-const int MENU_EXIT     = 5;
+// Глобальные константы программы
+namespace Config {
+    const string VERSION = "1.0";
+}
 
-// Константы меню настроек
-const int SET_SPECIALITY = 1;
-const int SET_NAME       = 2;
-const int SET_SUBJECTS   = 3;
-const int SET_BACK       = 4;
-
-const string VERSION = "1.0";
-
-// Структура для хранения пользовательских настроек
-struct Settings {
-    string speciality = "Программная инженерия";
-    string studentName = "Кристина";
-    int    subjectsCount = 5;
+// Идентификаторы для главного меню
+enum MainMenuOption {
+    OPT_START = 1,
+    OPT_LOAD,
+    OPT_SETTINGS,
+    OPT_ABOUT,
+    OPT_EXIT
 };
 
-// Очистка потока ввода при ошибках
-void clearInput() {
+// Идентификаторы для меню настроек
+enum SettingsMenuOption {
+    OPT_CHANGE_SPECIALITY = 1,
+    OPT_CHANGE_NAME,
+    OPT_CHANGE_SUBJECTS,
+    OPT_BACK
+};
+
+// Класс для инкапсуляции пользовательских настроек
+class UserProfile {
+private:
+    string specialityField;
+    string nameField;
+    int subjectsCountField;
+
+public:
+    UserProfile() : specialityField("Программная инженерия"), 
+                    nameField("Кристина"), 
+                    subjectsCountField(5) {}
+
+    string getSpeciality() const { return specialityField; }
+    void setSpeciality(const string& s) { specialityField = s; }
+
+    string getName() const { return nameField; }
+    void setName(const string& n) { nameField = n; }
+
+    int getSubjectsCount() const { return subjectsCountField; }
+    void setSubjectsCount(int count) { subjectsCountField = count; }
+};
+
+// Вспомогательные функции
+void flushInput() {
     cin.clear();
     cin.ignore(10000, '\n');
 }
 
-// Ожидание нажатия клавиши Enter
-void waitEnter() {
+void pauseAndReturn() {
     cout << "\nНажмите Enter, чтобы вернуться в меню...";
     cin.get();
 }
 
-// Пункт меню "О программе"
-void aboutProgram() {
-    cout << "\n=== О программе ===\n";
-    cout << "Версия: " << VERSION << "\n";
-    cout << "Студент: Фамилия Имя\n";
-    waitEnter();
-}
-
-// Пункт меню "Загрузить игру"
-void loadGame() {
-    cout << "\nФункция загрузки пока недоступна.\n";
-    cout << "Она появится в ближайших обновлениях.\n";
-    waitEnter();
-}
-
-// Пункт меню "Начать игру"
-void startGame() {
+// Логические блоки программы
+void executeStart() {
     cout << "\n=== Начало игры \"Моя жизнь в университете\" ===\n";
     cout << "Вы поступаете в университет. Удачи!\n";
-    waitEnter();
+    pauseAndReturn();
 }
 
-// Меню настроек
-void settingsMenu(Settings& s) {
-    int choice = 0;
-    while (choice != SET_BACK) {
+void executeLoad() {
+    cout << "\nФункция загрузки пока недоступна.\n";
+    cout << "Она появится в ближайших обновлениях.\n";
+    pauseAndReturn();
+}
+
+void executeAbout() {
+    cout << "\n=== О программе ===\n";
+    cout << "Версия: " << Config::VERSION << "\n";
+    cout << "Студент: Фамилия Имя\n";
+    pauseAndReturn();
+}
+
+void executeSettings(UserProfile& profile) {
+    int menuItem = 0;
+    
+    while (menuItem != OPT_BACK) {
         cout << "\n--- Настройки ---\n";
-        cout << "1. Специальность (текущая: " << s.speciality << ")\n";
-        cout << "2. Имя студента (текущее: " << s.studentName << ")\n";
-        cout << "3. Количество предметов (текущее: " << s.subjectsCount << ")\n";
+        cout << "1. Специальность (текущая: " << profile.getSpeciality() << ")\n";
+        cout << "2. Имя студента (текущее: " << profile.getName() << ")\n";
+        cout << "3. Количество предметов (текущее: " << profile.getSubjectsCount() << ")\n";
         cout << "4. Назад\n";
         cout << "Выбор: ";
-        cin >> choice;
+        
+        cin >> menuItem;
 
         if (cin.fail()) {
-            clearInput();
+            flushInput();
             cout << "Некорректный ввод!\n";
             continue;
         }
 
-        switch (choice) {
-        case SET_SPECIALITY:
-            cout << "Введите специальность: ";
-            clearInput();
-            getline(cin, s.speciality);
-            break;
-        case SET_NAME:
-            cout << "Введите имя студента: ";
-            clearInput();
-            getline(cin, s.studentName);
-            break;
-        case SET_SUBJECTS: {
-            cout << "Введите количество предметов: ";
-            int n;
-            cin >> n;
-            if (cin.fail() || n <= 0) {
-                clearInput();
-                cout << "Некорректное значение!\n";
+        switch (menuItem) {
+            case OPT_CHANGE_SPECIALITY: {
+                string inputVal;
+                cout << "Введите специальность: ";
+                flushInput();
+                getline(cin, inputVal);
+                profile.setSpeciality(inputVal);
+                break;
             }
-            else {
-                s.subjectsCount = n;
+            case OPT_CHANGE_NAME: {
+                string inputVal;
+                cout << "Введите имя студента: ";
+                flushInput();
+                getline(cin, inputVal);
+                profile.setName(inputVal);
+                break;
             }
-            break;
-        }
-        case SET_BACK:
-            break;
-        default:
-            cout << "Такого пункта нет.\n";
+            case OPT_CHANGE_SUBJECTS: {
+                int count = 0;
+                cout << "Введите количество предметов: ";
+                cin >> count;
+                
+                if (cin.fail() || count <= 0) {
+                    flushInput();
+                    cout << "Некорректное значение!\n";
+                } else {
+                    profile.setSubjectsCount(count);
+                }
+                break;
+            }
+            case OPT_BACK:
+                break;
+            default:
+                cout << "Такого пункта нет.\n";
         }
     }
 }
 
 int main() {
-    // Настройка кодировки для корректного отображения кириллицы в Windows
+    // Установка русской кодировки для Windows
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     setlocale(LC_ALL, "Russian");
 
-    Settings settings;
-    int choice = 0;
+    UserProfile currentUser;
+    int userChoice = 0;
 
-    while (choice != MENU_EXIT) {
+    while (userChoice != OPT_EXIT) {
         cout << "\n*** Моя жизнь в университете ***\n";
         cout << "1. Начать игру\n";
         cout << "2. Загрузить игру\n";
@@ -128,32 +154,26 @@ int main() {
         cout << "4. О программе\n";
         cout << "5. Выход\n";
         cout << "Выбор: ";
-        cin >> choice;
+        
+        cin >> userChoice;
 
         if (cin.fail()) {
-            clearInput();
+            flushInput();
             cout << "Некорректный ввод!\n";
             continue;
         }
 
-        // Обработка выбора пользователя
-        switch (choice) {
-        case MENU_START:    
-            startGame();            
-            break;
-        case MENU_LOAD:     
-            loadGame();             
-            break;
-        case MENU_SETTINGS: 
-            settingsMenu(settings); 
-            break;
-        case MENU_ABOUT:    
-            aboutProgram();         
-            break;
-        case MENU_EXIT:
+        if (userChoice == OPT_START) {
+            executeStart();
+        } else if (userChoice == OPT_LOAD) {
+            executeLoad();
+        } else if (userChoice == OPT_SETTINGS) {
+            executeSettings(currentUser);
+        } else if (userChoice == OPT_ABOUT) {
+            executeAbout();
+        } else if (userChoice == OPT_EXIT) {
             cout << "Выход из программы...\n";
-            break;
-        default:
+        } else {
             cout << "Такого пункта нет.\n";
         }
     }
