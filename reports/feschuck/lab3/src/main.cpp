@@ -7,127 +7,132 @@
 #include <algorithm>
 using namespace std;
 
-struct GameSettings {
+struct GameConfig {
     int citySize = 10, budget = 1000, population = 100;
 };
 
-class SettingsManager {
-    GameSettings s;
-    queue<int> qSize, qBudget, qPop;
+class ConfigManager {
+    GameConfig cfg;
+    queue<int> sizeOptions, budgetOptions, popOptions;
 
-    void load(const string& f, queue<int>& q, const vector<int>& def) {
-        ifstream in(f);
+    void loadData(const string& filename, queue<int>& q, const vector<int>& defaults) {
+        ifstream in(filename);
         int v;
         if (in.good()) { while (in >> v) q.push(v); return; }
-        ofstream out(f);
-        for (int x : def) { out << x << "\n"; q.push(x); }
+        ofstream out(filename);
+        for (int x : defaults) { out << x << "\n"; q.push(x); }
     }
 
-    int next(queue<int>& q, int cur) {
-        if (q.empty()) return cur;
-        int first = q.front(), res = first;
+    int getNextValue(queue<int>& q, int current) {
+        if (q.empty()) return current;
+        int firstVal = q.front(), nextVal = firstVal;
         for (size_t i = 0; i < q.size(); ++i) {
             int v = q.front(); q.pop(); q.push(v);
-            if (v == cur) { q.pop(); res = q.empty() ? first : q.front(); q.push(res); break; }
+            if (v == current) { q.pop(); nextVal = q.empty() ? firstVal : q.front(); q.push(nextVal); break; }
         }
-        return res;
+        return nextVal;
     }
 
 public:
-    SettingsManager() {
-        load("city_size_values.txt", qSize, { 10, 20, 30 });
-        load("budget_values.txt", qBudget, { 1000, 5000, 10000 });
-        load("population_values.txt", qPop, { 100, 500, 1000 });
+    ConfigManager() {
+        loadData("city_size_values.txt", sizeOptions, { 10, 20, 30 });
+        loadData("budget_values.txt", budgetOptions, { 1000, 5000, 10000 });
+        loadData("population_values.txt", popOptions, { 100, 500, 1000 });
         ifstream in("settings.txt");
-        if (!(in >> s.citySize >> s.budget >> s.population)) save();
+        if (!(in >> cfg.citySize >> cfg.budget >> cfg.population)) saveConfig();
     }
-    GameSettings& get() { return s; }
-    void save() {
+    GameConfig& getSettings() { return cfg; }
+    void saveConfig() {
         ofstream out("settings.txt");
-        out << s.citySize << "\n" << s.budget << "\n" << s.population << "\n";
+        out << cfg.citySize << "\n" << cfg.budget << "\n" << cfg.population << "\n";
     }
-    void nextSize() { s.citySize = next(qSize, s.citySize);   save(); }
-    void nextBudget() { s.budget = next(qBudget, s.budget);     save(); }
-    void nextPop() { s.population = next(qPop, s.population); save(); }
+    void changeSize() { cfg.citySize = getNextValue(sizeOptions, cfg.citySize); saveConfig(); }
+    void changeBudget() { cfg.budget = getNextValue(budgetOptions, cfg.budget); saveConfig(); }
+    void changePop() { cfg.population = getNextValue(popOptions, cfg.population); saveConfig(); }
 };
 
-// ==================== КЛАССЫ ИГРЫ ====================
-class Building {
+// ==================== ИГРОВЫЕ СУЩНОСТИ ====================
+class CityObject {
 public:
-    string name;
-    int cost, income, popBonus, happyBonus;
-    Building(string n, int c, int inc, int pop, int hap)
-        : name(n), cost(c), income(inc), popBonus(pop), happyBonus(hap) {
-    }
+    string title;
+    int price, weeklyIncome, citizenBonus, moodBonus;
+    CityObject(string t, int p, int inc, int pop, int mood)
+        : title(t), price(p), weeklyIncome(inc), citizenBonus(pop), moodBonus(mood) {}
 
-    void printInfo(int idx) const {
-        cout << " " << idx << ". " << name
-            << " | цена: " << cost
-            << " | доход/нед: " << income
-            << " | жители: +" << popBonus
-            << " | счастье: " << (happyBonus >= 0 ? "+" : "") << happyBonus << "\n";
+    void display(int index) const {
+        cout << " [" << index << "] " << title
+            << " | Стоимость: " << price
+            << " | Прибыль: " << weeklyIncome
+            << " | +Жители: " << citizenBonus
+            << " | Настроение: " << (moodBonus >= 0 ? "+" : "") << moodBonus << "\n";
     }
 };
 
-class Town {
+class CitySimulation {
 public:
-    int size, budget, population, happiness = 50;
-    vector<Building> buildings;
-    Town(int sz, int bud, int pop) : size(sz), budget(bud), population(pop) {}
+    int maxBuildings, currentBudget, totalPopulation, happinessLevel = 50;
+    vector<CityObject> constructedObjects;
+    
+    CitySimulation(int limit, int cash, int people) 
+        : maxBuildings(limit), currentBudget(cash), totalPopulation(people) {}
 
-    bool build(const Building& b) {
-        if (budget < b.cost) {
-            cout << "Недостаточно средств для постройки " << b.name << "!\n";
+    bool construct(const CityObject& obj) {
+        if (currentBudget < obj.price) {
+            cout << "Ошибка: не хватает денег на " << obj.title << "!\n";
             return false;
         }
-        if ((int)buildings.size() >= size) {
-            cout << "Достигнут лимит зданий (" << size << ").\n";
+        if ((int)constructedObjects.size() >= maxBuildings) {
+            cout << "Ошибка: в городе больше нет места (лимит: " << maxBuildings << ").\n";
             return false;
         }
-        budget -= b.cost;
-        population += b.popBonus;
-        happiness = min(100, max(0, happiness + b.happyBonus));
-        buildings.push_back(b);
-        cout << "Построено: " << b.name << "\n";
+        currentBudget -= obj.price;
+        totalPopulation += obj.citizenBonus;
+        happinessLevel = min(100, max(0, happinessLevel + obj.moodBonus));
+        constructedObjects.push_back(obj);
+        cout << "Успешно возведено: " << obj.title << "\n";
         return true;
     }
 
-    void status() const {
-        cout << "--- СОСТОЯНИЕ ГОРОДА ---\n";
-        cout << "Размер: " << size << " (зданий: " << buildings.size() << "/" << size << ")\n";
-        cout << "Бюджет: " << budget << "\n";
-        cout << "Население: " << population << "\n";
-        cout << "Счастье: " << happiness << "/100\n";
-        if (!buildings.empty()) {
-            cout << "Построенные здания:\n";
-            for (size_t i = 0; i < buildings.size(); ++i)
-                cout << "  " << (i + 1) << ". " << buildings[i].name << "\n";
+    void printStatus() const {
+        cout << "--- ОТЧЕТ О ГОРОДЕ ---\n";
+        cout << "Земля: " << maxBuildings << " мест (занято: " << constructedObjects.size() << ")\n";
+        cout << "Казна: " << currentBudget << "\n";
+        cout << "Граждане: " << totalPopulation << "\n";
+        cout << "Уровень счастья: " << happinessLevel << "/100\n";
+        if (!constructedObjects.empty()) {
+            cout << "Инфраструктура:\n";
+            for (size_t i = 0; i < constructedObjects.size(); ++i)
+                cout << "  - " << constructedObjects[i].title << "\n";
         }
     }
 
-    int endWeek() {
-        int income = 0;
-        for (auto& b : buildings) income += b.income;
-        int taxes = population / 10;
-        double mod = 0.5 + happiness / 100.0;
-        int total = int((income + taxes) * mod);
-        budget += total;
-        if (happiness >= 60) population += population / 20;
-        else if (happiness <= 30) population -= population / 25;
-        return total;
+    int simulateWeek() {
+        int profit = 0;
+        for (auto& b : constructedObjects) profit += b.weeklyIncome;
+        int taxes = totalPopulation / 10;
+        double multiplier = 0.5 + happinessLevel / 100.0;
+        int finalIncome = int((profit + taxes) * multiplier);
+        currentBudget += finalIncome;
+        if (happinessLevel >= 60) totalPopulation += totalPopulation / 20;
+        else if (happinessLevel <= 30) totalPopulation -= totalPopulation / 25;
+        return finalIncome;
     }
 };
 
-class Mayor {
+class PlayerActions {
 public:
-    int actions = 5, week = 0;
-    void reset() { actions = 5; }
-    bool has() const { return actions > 0; }
-    void use() { --actions; }
+    int movesLeft = 5, currentWeek = 0;
+    // Добавили счетчики для концовок
+    int builtCount = 0; 
+    int festivalsCount = 0; 
+
+    void resetMoves() { movesLeft = 5; }
+    bool canMove() const { return movesLeft > 0; }
+    void spendMove() { --movesLeft; }
 };
 
-// ==================== УТИЛИТЫ ====================
-void clearScreen() {
+// ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+void cls() {
 #ifdef _WIN32
     system("cls");
 #else
@@ -135,165 +140,199 @@ void clearScreen() {
 #endif
 }
 
-void wait() {
-    cout << "\nНажмите Enter, чтобы продолжить...";
+void pause() {
+    cout << "\n[Нажмите Enter для продолжения...]";
     cin.get();
 }
 
-int readInt(const string& p) {
-    int v;
+int getUserInput(const string& prompt) {
+    int val;
     while (true) {
-        cout << p;
-        if (cin >> v) { cin.ignore(10000, '\n'); return v; }
+        cout << prompt;
+        if (cin >> val) { cin.ignore(10000, '\n'); return val; }
         cin.clear(); cin.ignore(10000, '\n');
-        cout << "Ошибка ввода. Введите число.\n";
+        cout << "Неверный формат. Попробуйте снова.\n";
     }
 }
 
-// ==================== ЛОГИКА ИГРЫ ====================
-void startGame(const GameSettings& cfg) {
-    clearScreen();
-    cout << "=== НАЧАЛО ИГРЫ: «ГОРОД МЕЧТЫ» ===\n\n";
-    cout << "Вы вступили в должность градоправителя!\n";
-    cout << "Начальные параметры (из настроек):\n";
-    cout << "  Размер города: " << cfg.citySize << "\n";
-    cout << "  Бюджет: " << cfg.budget << "\n";
-    cout << "  Население: " << cfg.population << "\n";
+// ==================== ОСНОВНОЙ ЦИКЛ ====================
+void runSimulation(const GameConfig& settings) {
+    cls();
+    cout << ">>> СТАРТ СИМУЛЯЦИИ: «ГОРОД МЕЧТЫ» <<<\n\n";
+    cout << "Добро пожаловать на пост мэра!\n";
+    cout << "Ваши стартовые условия:\n";
+    cout << "  Площадь: " << settings.citySize << "\n";
+    cout << "  Стартовый капитал: " << settings.budget << "\n";
+    cout << "  Жители: " << settings.population << "\n";
 
-    Town town(cfg.citySize, cfg.budget, cfg.population);
-    Mayor mayor;
-    vector<Building> catalog = {
-        {"Жилой дом", 200, 20, 30, 5},
-        {"Магазин",   300, 60,  5, 3},
-        {"Фабрика",   500, 120,10,-5},
-        {"Парк",      150, 5,   0,15},
-        {"Школа",     400, 30,  5,10},
-        {"Театр",     350, 40,  0,18}
+    CitySimulation game(settings.citySize, settings.budget, settings.population);
+    PlayerActions player;
+    vector<CityObject> shop = {
+        {"Жилой комплекс", 200, 20, 30, 5},
+        {"Торговый центр", 300, 60, 5, 3},
+        {"Завод", 500, 120, 10, -5},
+        {"Сквер", 150, 5, 0, 15},
+        {"Гимназия", 400, 30, 5, 10},
+        {"Оперный театр", 350, 40, 0, 18}
     };
 
-    const int MAX_WEEKS = 6;
-    while (mayor.week < MAX_WEEKS) {
-        mayor.reset();
-        mayor.week++;
-        cout << "\n=============================================\n";
-        cout << " НЕДЕЛЯ " << mayor.week << " / " << MAX_WEEKS << "\n";
-        cout << "=============================================\n";
+    const int TOTAL_WEEKS = 6;
+    while (player.currentWeek < TOTAL_WEEKS) {
+        player.resetMoves();
+        player.currentWeek++;
+        cout << "\n---------------------------------------------\n";
+        cout << " ТЕКУЩАЯ НЕДЕЛЯ: " << player.currentWeek << " из " << TOTAL_WEEKS << "\n";
+        cout << "---------------------------------------------\n";
 
-        while (mayor.has()) {
-            clearScreen();
-            town.status();
-            cout << "\nДействий осталось: " << mayor.actions << "\n";
-            cout << "1. Построить здание\n";
-            cout << "2. Провести мероприятие (+10 счастья, -100 бюджета)\n";
-            cout << "3. Пропустить оставшиеся действия\n";
-            int c = readInt("Выберите действие: ");
+        while (player.canMove()) {
+            cls();
+            game.printStatus();
+            cout << "\nХодов осталось: " << player.movesLeft << "\n";
+            cout << "1. Строительство\n";
+            cout << "2. Организовать праздник (+10 счастья, -100 монет)\n";
+            cout << "3. Завершить неделю\n";
+            int action = getUserInput("Ваш выбор: ");
 
-            if (c == 1) {
-                clearScreen();
-                cout << "=== ДОСТУПНЫЕ ЗДАНИЯ ===\n";
-                for (size_t i = 0; i < catalog.size(); ++i)
-                    catalog[i].printInfo(i + 1);
-                cout << " 0. Отмена\n";
-                int b = readInt("Выберите здание: ");
-                if (b >= 1 && b <= (int)catalog.size()) {
-                    if (town.build(catalog[b - 1])) mayor.use();
-                    wait();
+            if (action == 1) {
+                cls();
+                cout << "=== ДОСТУПНЫЕ ПРОЕКТЫ ===\n";
+                for (size_t i = 0; i < shop.size(); ++i) shop[i].display(i + 1);
+                cout << " 0. Вернуться\n";
+                int choice = getUserInput("Что будем строить? ");
+                if (choice >= 1 && choice <= (int)shop.size()) {
+                    if (game.construct(shop[choice - 1])) {
+                        player.spendMove();
+                        player.builtCount++; // Считаем постройки
+                    }
+                    pause();
                 }
             }
-            else if (c == 2) {
-                if (town.budget >= 100) {
-                    town.budget -= 100;
-                    town.happiness = min(100, town.happiness + 10);
-                    cout << "Мероприятие проведено! Счастье +10.\n";
-                    mayor.use();
+            else if (action == 2) {
+                if (game.currentBudget >= 100) {
+                    game.currentBudget -= 100;
+                    game.happinessLevel = min(100, game.happinessLevel + 10);
+                    cout << "Праздник удался! Счастье выросло.\n";
+                    player.spendMove();
+                    player.festivalsCount++; // Считаем праздники
                 }
-                else cout << "Недостаточно бюджета для мероприятия.\n";
-                wait();
+                else cout << "В казне пусто, праздник отменяется.\n";
+                pause();
             }
-            else if (c == 3) {
-                mayor.actions = 0;
+            else if (action == 3) {
+                player.movesLeft = 0;
             }
             else {
-                cout << "Неверный пункт меню!\n";
-                wait();
+                cout << "Такого пункта нет!\n";
+                pause();
             }
         }
 
-        int income = town.endWeek();
-        cout << "\n=== ИТОГИ НЕДЕЛИ " << mayor.week << " ===\n";
-        cout << "Доход за неделю: " << income << "\n";
-        cout << "Текущий бюджет: " << town.budget << "\n";
-        cout << "Население: " << town.population << "\n";
-        cout << "Счастье: " << town.happiness << "/100\n";
-        wait();
+        int weekProfit = game.simulateWeek();
+        cout << "\n=== ИТОГИ НЕДЕЛИ " << player.currentWeek << " ===\n";
+        cout << "Прибыль: " << weekProfit << "\n";
+        cout << "Остаток в казне: " << game.currentBudget << "\n";
+        cout << "Численность: " << game.totalPopulation << "\n";
+        cout << "Счастье: " << game.happinessLevel << "/100\n";
+        pause();
     }
 
-    clearScreen();
-    cout << "=== ИГРА ЗАВЕРШЕНА ===\n";
-    town.status();
-    int score = town.budget + town.population * 2 + town.happiness * 5;
-    cout << "\nИтоговый счёт: " << score << "\n";
-    cout << "(бюджет + население*2 + счастье*5)\n";
-    wait();
+    cls();
+    cout << "=== СИМУЛЯЦИЯ ЗАВЕРШЕНА ===\n";
+    game.printStatus();
+    
+    int finalScore = game.currentBudget + game.totalPopulation * 2 + game.happinessLevel * 5;
+    
+    // ==================== ВЫСТАВЛЕНИЕ ВЕРДИКТА ====================
+    cout << "\n=============================================\n";
+    cout << " ВЕРДИКТ ГОРОДСКОГО СОВЕТА\n";
+    cout << "=============================================\n";
+    
+    if (player.builtCount == 0 && player.festivalsCount == 0) {
+        cout << "❌ СНЯТ С ДОЛЖНОСТИ МЭРА!\n";
+        cout << "Вы абсолютно ничего не сделали для города. За 6 недель не было\n";
+        cout << "построено ни одного здания и не проведено ни одного праздника.\n";
+        cout << "Горожане требуют импичмента!\n";
+    } else if (player.builtCount <= 3) {
+        cout << "⚠️ ВЫ ЕДВА СПРАВИЛИСЬ С ОБЯЗАННОСТЯМИ\n";
+        cout << "Город развивался слишком медленно (построено зданий: " << player.builtCount << ").\n";
+        cout << "Совет выражает вам недоверие, но дает второй шанс.\n";
+    } else if (game.happinessLevel <= 20) {
+        cout << "😡 ГОРОД В УПАДКЕ!\n";
+        cout << "Вы настроили много зданий (" << player.builtCount << "), но забыли о людях.\n";
+        cout << "Уровень счастья упал до " << game.happinessLevel << ". Начались забастовки!\n";
+    } else if (player.builtCount >= 10 && game.happinessLevel >= 70) {
+        cout << "🏆 ВЫ - ВЕЛИКИЙ МЭР!\n";
+        cout << "Вы превратили город в процветающий мегаполис! Построено зданий: " << player.builtCount << ".\n";
+        cout << "Уровень счастья зашкаливает (" << game.happinessLevel << "/100).\n";
+        cout << "Горожане готовы поставить вам памятник при жизни!\n";
+    } else {
+        cout << "👍 СТАБИЛЬНЫЙ РУКОВОДИТЕЛЬ\n";
+        cout << "Вы неплохо справились. Построено зданий: " << player.builtCount << ".\n";
+        cout << "Город живет стабильно, но ему еще есть куда расти.\n";
+    }
+    cout << "=============================================\n";
+
+    cout << "\nВаш итоговый рейтинг: " << finalScore << "\n";
+    cout << "(Формула: казна + люди*2 + счастье*5)\n";
+    pause();
 }
 
-// ==================== МЕНЮ ====================
-void settingsMenu(SettingsManager& sm) {
-    int c = 0;
-    while (c != 4) {
-        clearScreen();
+void configureGame(ConfigManager& cfm) {
+    int choice = 0;
+    while (choice != 4) {
+        cls();
         cout << "=====================================\n";
-        cout << " НАСТРОЙКИ\n";
+        cout << " НАСТРОЙКИ СИМУЛЯЦИИ\n";
         cout << "=====================================\n";
-        cout << "1. Размер города: " << sm.get().citySize << "\n";
-        cout << "2. Начальный бюджет: " << sm.get().budget << "\n";
-        cout << "3. Количество жителей: " << sm.get().population << "\n";
-        cout << "4. Назад\n";
+        cout << "1. Площадь города: " << cfm.getSettings().citySize << "\n";
+        cout << "2. Бюджет: " << cfm.getSettings().budget << "\n";
+        cout << "3. Население: " << cfm.getSettings().population << "\n";
+        cout << "4. Вернуться в главное меню\n";
         cout << "=====================================\n";
-        c = readInt("Выберите пункт: ");
-        if (c == 1) sm.nextSize();
-        else if (c == 2) sm.nextBudget();
-        else if (c == 3) sm.nextPop();
+        choice = getUserInput("Выберите параметр: ");
+        if (choice == 1) cfm.changeSize();
+        else if (choice == 2) cfm.changeBudget();
+        else if (choice == 3) cfm.changePop();
     }
 }
 
 #ifndef UNIT_TEST
 int main() {
     setlocale(LC_ALL, "Russian");
-    SettingsManager sm;
-    int choice = 0;
+    ConfigManager config;
+    int menuChoice = 0;
 
-    while (choice != 5) {
-        clearScreen();
+    while (menuChoice != 5) {
+        cls();
         cout << "=====================================\n";
-        cout << " ГОРОД МЕЧТЫ\n";
+        cout << " ДОБРО ПОЖАЛОВАТЬ В ГОРОД МЕЧТЫ\n";
         cout << "=====================================\n";
-        cout << "1. Начать игру\n";
-        cout << "2. Загрузить игру\n";
-        cout << "3. Настройки\n";
-        cout << "4. О программе\n";
+        cout << "1. Новая игра\n";
+        cout << "2. Загрузить сохранение\n";
+        cout << "3. Параметры\n";
+        cout << "4. Информация\n";
         cout << "5. Выход\n";
         cout << "=====================================\n";
-        choice = readInt("Выберите пункт меню: ");
+        menuChoice = getUserInput("Выберите действие: ");
 
-        if (choice == 1) startGame(sm.get());
-        else if (choice == 2) {
-            clearScreen();
-            cout << "=== ЗАГРУЗКА ИГРЫ ===\n";
-            cout << "Функция пока недоступна.\n";
-            wait();
+        if (menuChoice == 1) runSimulation(config.getSettings());
+        else if (menuChoice == 2) {
+            cls();
+            cout << "=== ЗАГРУЗКА ===\n";
+            cout << "Сохранения пока не поддерживаются.\n";
+            pause();
         }
-        else if (choice == 3) settingsMenu(sm);
-        else if (choice == 4) {
-            clearScreen();
-            cout << "=== О ПРОГРАММЕ ===\n";
+        else if (menuChoice == 3) configureGame(config);
+        else if (menuChoice == 4) {
+            cls();
+            cout << "=== О ПРОЕКТЕ ===\n";
             cout << "Игра: «Город мечты»\n";
-            cout << "Версия: 2.0 (ЛР3, вариант 4)\n";
-            cout << "Студент: Фещук Артём\n";
-            wait();
+            cout << "Версия: 2.0 (ЛР3)\n";
+            cout << "Автор: Фещук Артём\n";
+            pause();
         }
-        else if (choice == 5) cout << "Выход из программы...\n";
-        else { cout << "Неверный пункт меню!\n"; wait(); }
+        else if (menuChoice == 5) cout << "Завершение работы...\n";
+        else { cout << "Ошибка ввода!\n"; pause(); }
     }
     return 0;
 }
