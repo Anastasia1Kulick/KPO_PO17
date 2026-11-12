@@ -1,16 +1,11 @@
 #define UNIT_TEST
+#include "../src/main.cpp"
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <cstdio>
 #include <string>
-
-struct GameSettings;
-class SettingsManager;
-class Building;
-class Town;
-class Mayor;
-void startGame(const GameSettings&);
 
 int pass = 0, fail = 0;
 
