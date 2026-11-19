@@ -36,18 +36,22 @@ public:
 
 class Action {
 public:
-    enum ActionType { VISIT, SKIP, HOME_STUDY, REST };
+    enum ActionType { VISIT, SKIP, HOME_STUDY, REST_HOME, REST_CINEMA, REST_WALK };
 private:
     ActionType type;
     string label;
     int kChange, eChange, mChange;
+    int cost; 
 public:
-    Action(ActionType t, string l, int k, int e, int m) : type(t), label(l), kChange(k), eChange(e), mChange(m) {}
+    Action(ActionType t, string l, int k, int e, int m, int c = 0) 
+        : type(t), label(l), kChange(k), eChange(e), mChange(m), cost(c) {}
+        
     ActionType getType() const { return type; }
     string getLabel() const { return label; }
     int getK() const { return kChange; }
     int getE() const { return eChange; }
     int getM() const { return mChange; }
+    int getCost() const { return cost; }
 };
 
 class Student {
@@ -56,8 +60,7 @@ private:
     string speciality;
     int knowledge, energy, motivation;
     int money;
-
-    // Вместо vector используем динамический массив
+    
     Subject* subjects;
     int subjectsCount;
     int capacity;
@@ -69,12 +72,10 @@ public:
         subjects = new Subject[capacity];
     }
 
-    // Деструктор для очистки памяти
     ~Student() {
         delete[] subjects;
     }
 
-    // Запрет копирования (чтобы избежать двойного удаления памяти)
     Student(const Student&) = delete;
     Student& operator=(const Student&) = delete;
 
@@ -85,7 +86,7 @@ public:
         energy = 80;
         motivation = 60;
         money = 500;
-        subjectsCount = 0; // Просто обнуляем счетчик, память перезапишется
+        subjectsCount = 0;
     }
 
     void addSubject(const Subject& subj) {
@@ -93,7 +94,7 @@ public:
             subjects[subjectsCount++] = subj;
         }
     }
-
+    
     void clearSubjects() { subjectsCount = 0; }
 
     Subject* getSubjects() { return subjects; }
@@ -108,6 +109,24 @@ public:
 
     void setState(int k, int e, int m, int cash) { knowledge = k; energy = e; motivation = m; money = cash; }
     void addMoney(int amount) { money += amount; }
+    
+    bool buyBun() {
+        if (money >= 50) {
+            money -= 50;
+            energy = min(100, energy + 10);
+            motivation = min(100, motivation + 5);
+            return true;
+        }
+        return false;
+    }
+
+    bool payForAction(int cost) {
+        if (money >= cost) {
+            money -= cost;
+            return true;
+        }
+        return false;
+    }
 
     void executeAction(const Action& act, Subject* target = nullptr) {
         knowledge = max(0, min(100, knowledge + act.getK()));
@@ -135,8 +154,7 @@ private:
     Student student;
     int maxDays;
     int currentDay;
-
-    // Константы игры
+    
     const int MAX_SLOTS = 6;
     const int MONTH_DURATION = 10;
     const int BASE_SALARY = 1000;
@@ -163,7 +181,7 @@ public:
 
         out << student.getName() << DELIM << student.getSpeciality() << DELIM
             << student.getKnowledge() << DELIM << student.getEnergy() << DELIM << student.getMotivation() << DELIM
-            << student.getMoney() << DELIM
+            << student.getMoney() << DELIM 
             << currentDay << DELIM << maxDays << "\n";
 
         out << student.getSubjectsCount() << "\n";
@@ -184,8 +202,7 @@ public:
         }
         if (save(getSlotFilename(slotToSave))) {
             cout << "[Успех] Игра сохранена в слот №" << slotToSave << "\n";
-        }
-        else { cout << "[Ошибка] Не удалось сохранить!\n"; }
+        } else { cout << "[Ошибка] Не удалось сохранить!\n"; }
     }
 
     bool load(const string& filename) {
@@ -209,7 +226,6 @@ public:
         if (!next(token)) return false; currentDay = toInt(token);
         if (!next(token)) return false; maxDays = toInt(token);
 
-        // ИСПОЛЬЗУЕМ НОВЫЙ МЕТОД RESET ВМЕСТО ПРИСВАИВАНИЯ
         student.reset(sName, sSpec);
         student.setState(k, e, m, cash);
 
@@ -239,9 +255,9 @@ public:
         string sName, sSpec;
         if (!next(sName) || !next(sSpec)) return false;
         if (!next(token)) return false; outKnowledge = toInt(token);
-        if (!next(token)) return false;
-        if (!next(token)) return false;
-        if (!next(token)) return false;
+        if (!next(token)) return false; 
+        if (!next(token)) return false; 
+        if (!next(token)) return false; 
         if (!next(token)) return false; outDay = toInt(token);
         return true;
     }
@@ -250,19 +266,38 @@ public:
         Action actVisit(Action::VISIT, "Посетить", 10, -15, 5);
         Action actSkip(Action::SKIP, "Прогулять", -5, 10, -10);
         Action actStudy(Action::HOME_STUDY, "Учиться дома", 7, -10, 2);
-        Action actRest(Action::REST, "Отдохнуть", 0, 20, 10);
+        
+        Action actRestHome(Action::REST_HOME, "Отдохнуть дома", 0, 20, 10, 0);
+        Action actRestWalk(Action::REST_WALK, "Погулять с друзьями", 0, 30, 20, 100);
+        Action actRestCinema(Action::REST_CINEMA, "Сходить в кино", 0, 40, 30, 200);
 
         while (currentDay <= maxDays) {
             student.printStatus();
             cout << "\n--- День " << currentDay << " из " << maxDays << " ---\n";
-            cout << "1. Посетить\n2. Прогулять\n3. Учиться дома\n4. Отдохнуть\n5. Сохранить и выйти\nВыбор: ";
+            cout << "1. Посетить пару\n";
+            cout << "2. Прогулять\n";
+            cout << "3. Учиться дома\n";
+            cout << "4. Отдохнуть дома (0 руб.)\n";
+            cout << "5. Погулять с друзьями (100 руб.)\n";
+            cout << "6. Сходить в кино (200 руб.)\n";
+            cout << "7. Купить булочку (50 руб.)\n";
+            cout << "8. Сохранить и выйти\nВыбор: ";
 
             int choice; cin >> choice;
             if (cin.fail()) { cin.clear(); cin.ignore(10000, '\n'); continue; }
 
-            if (choice == 5) {
+            if (choice == 8) {
                 saveManualWithSlots();
                 return;
+            }
+
+            if (choice == 7) {
+                if (student.buyBun()) {
+                    cout << "\n[Успешно] Вы съели булочку! Восстановлено +10 Энергии, +5 Мотивации. (Списано: -50 руб.)\n";
+                } else {
+                    cout << "\n[Ошибка] Недостаточно денег для покупки булочки!\n";
+                }
+                continue; 
             }
 
             Subject* target = nullptr;
@@ -278,11 +313,40 @@ public:
                 target = &subs[idx - 1];
             }
 
-            if (choice == 1) student.executeAction(actVisit, target);
-            else if (choice == 2) student.executeAction(actSkip, target);
-            else if (choice == 3) student.executeAction(actStudy, target);
-            else if (choice == 4) student.executeAction(actRest);
-            else continue;
+            bool actionSuccess = true;
+            if (choice == 1) {
+                student.executeAction(actVisit, target);
+                cout << "\n[Успешно] Вы посетили пару по предмету " << subs[target - subs].getTitle() << "!\n";
+            } else if (choice == 2) {
+                student.executeAction(actSkip, target);
+                cout << "\n[Успешно] Вы прогуляли пару по предмету " << subs[target - subs].getTitle() << "!\n";
+            } else if (choice == 3) {
+                student.executeAction(actStudy, target);
+                cout << "\n[Успешно] Вы позанимались дома по предмету " << subs[target - subs].getTitle() << "!\n";
+            } else if (choice == 4) {
+                student.executeAction(actRestHome);
+                cout << "\n[Успешно] Вы отдохнули дома! Восстановлено +20 Энергии, +10 Мотивации. (0 руб.)\n";
+            } else if (choice == 5) {
+                if (student.payForAction(actRestWalk.getCost())) {
+                    student.executeAction(actRestWalk);
+                    cout << "\n[Успешно] Вы погуляли с друзьями! Восстановлено +30 Энергии, +20 Мотивации. (Списано: -100 руб.)\n";
+                } else { 
+                    cout << "\n[Ошибка] Не хватает денег на прогулку (нужно 100 руб.)!\n"; 
+                    actionSuccess = false; 
+                }
+            } else if (choice == 6) {
+                if (student.payForAction(actRestCinema.getCost())) {
+                    student.executeAction(actRestCinema);
+                    cout << "\n[Успешно] Вы сходили в кино! Восстановлено +40 Энергии, +30 Мотивации. (Списано: -200 руб.)\n";
+                } else { 
+                    cout << "\n[Ошибка] Не хватает денег на кино (нужно 200 руб.)!\n"; 
+                    actionSuccess = false; 
+                }
+            } else {
+                continue;
+            }
+
+            if (!actionSuccess) continue;
 
             if (currentDay % MONTH_DURATION == 0) {
                 processMonthEnd();
@@ -304,14 +368,12 @@ private:
         int salary = BASE_SALARY;
 
         if (knowledge >= 50) {
-            cout << "[Успех] Знания (" << knowledge << ") в норме. УРААААА. Стипендия выплачена.\n";
-        }
-        else if (knowledge >= 30) {
-            cout << "[Предупреждение] Низкие знания (" << knowledge << "). О НЕЕЕЕЕТ. Стипендия урезана.\n";
+            cout << "[Успех] Знания (" << knowledge << ") в норме. Стипендия выплачена.\n";
+        } else if (knowledge >= 30) {
+            cout << "[Предупреждение] Низкие знания (" << knowledge << "). Стипендия урезана.\n";
             salary /= 2;
-        }
-        else {
-            cout << "[Провал] Аттестация не пройдена (знания < 30). О НЕЕЕЕТ. Стипендии нет!\n";
+        } else {
+            cout << "[Провал] Аттестация не пройдена (знания < 30). Стипендии нет!\n";
             salary = 0;
         }
 
@@ -345,10 +407,20 @@ private:
 
         double avg = (count == 0) ? 0.0 : (double)totalScore / count;
         cout << "\nСредний балл: " << avg << "\n";
-        if (avg >= 4.5) cout << "ОТЛИЧНИК! Стипендия.\n";
-        else if (avg >= 3.5) cout << "Хороший результат!\n";
-        else if (avg >= 2.5) cout << "Сессия сдана, но есть ДОЛГИ!\n";
-        else cout << "ВАС ОТЧИСЛИЛИ...\n";
+        if (avg >= 4.5) cout << "Отличник! Стипендия.\n";
+        else if (avg >= 3.5) cout << "Хороший результат.\n";
+        else if (avg >= 2.5) cout << "Сессия сдана, но есть долги.\n";
+        else cout << "Отчислили...\n";
+
+        // ИТОГОВАЯ СТАТИСТИКА
+        cout << "\n==================================\n";
+        cout << "       ИТОГОВАЯ СТАТИСТИКА        \n";
+        cout << "==================================\n";
+        cout << "Баланс:   " << student.getMoney() << " руб.\n";
+        cout << "Знания:   " << student.getKnowledge() << " / 100\n";
+        cout << "Энергия:  " << student.getEnergy() << " / 100\n";
+        cout << "Мотивация:" << student.getMotivation() << " / 100\n";
+        cout << "==================================\n";
     }
 };
 
@@ -371,8 +443,7 @@ void loadSavedGame() {
         int day, knowledge;
         if (tempEngine.peekSlotInfo(i, day, knowledge)) {
             cout << i << ". Ручное сохранение №" << i << " (День " << day << ", Знания: " << knowledge << ")\n";
-        }
-        else {
+        } else {
             cout << i << ". [Пустой слот]\n";
         }
     }
@@ -393,8 +464,7 @@ void loadSavedGame() {
     if (engine.load(file)) {
         cout << "\n[Успех] Игра загружена.\n";
         engine.play();
-    }
-    else {
+    } else {
         cout << "[Ошибка] Файл поврежден!\n";
     }
     cin.get(); cin.get();
@@ -408,13 +478,20 @@ void showAbout() {
 void settingsMenu(Settings& s, const list<string>& students, const set<string>& specs) {
     int choice = 0;
     while (choice != 4) {
-        cout << "\n--- Настройки ---\n1. Специальность\n2. Имя\n3. Кол-во предметов\n4. Назад\nВыбор: ";
+        cout << "\n--- Настройки ---\n";
+        cout << "1. Специальность (текущая: " << s.speciality << ")\n";
+        cout << "2. Имя (текущее: " << s.studentName << ")\n";
+        cout << "3. Кол-во предметов (текущее: " << s.subjectsCount << ")\n";
+        cout << "4. Назад\n";
+        cout << "Выбор: ";
+        
         cin >> choice;
         if (cin.fail()) { cin.clear(); cin.ignore(10000, '\n'); continue; }
 
         if (choice == 1) {
             cin.ignore();
             int i = 1;
+            cout << "\nДоступные специальности:\n";
             for (const auto& item : specs) cout << i++ << ". " << item << "\n";
             cout << "Выберите номер: ";
             int n; cin >> n;
@@ -423,11 +500,12 @@ void settingsMenu(Settings& s, const list<string>& students, const set<string>& 
                 s.speciality = *it;
                 ofstream out("settings.txt");
                 out << "speciality=" << s.speciality << "\nstudentName=" << s.studentName << "\nsubjectsCount=" << s.subjectsCount << "\n";
+                cout << "[Успех] Специальность изменена на: " << s.speciality << "\n";
             }
-        }
-        else if (choice == 2) {
+        } else if (choice == 2) {
             cin.ignore();
             int i = 1;
+            cout << "\nДоступные студенты:\n";
             for (const auto& item : students) cout << i++ << ". " << item << "\n";
             cout << "Выберите номер: ";
             int n; cin >> n;
@@ -436,15 +514,17 @@ void settingsMenu(Settings& s, const list<string>& students, const set<string>& 
                 s.studentName = *it;
                 ofstream out("settings.txt");
                 out << "speciality=" << s.speciality << "\nstudentName=" << s.studentName << "\nsubjectsCount=" << s.subjectsCount << "\n";
+                cout << "[Успех] Имя изменено на: " << s.studentName << "\n";
             }
-        }
-        else if (choice == 3) {
+        } else if (choice == 3) {
+            cout << "Введите новое количество предметов: ";
             int n; cin >> n;
             if (cin.fail() || n <= 0) { cin.clear(); cin.ignore(10000, '\n'); cout << "Ошибка!\n"; }
             else {
                 s.subjectsCount = n;
                 ofstream out("settings.txt");
                 out << "speciality=" << s.speciality << "\nstudentName=" << s.studentName << "\nsubjectsCount=" << s.subjectsCount << "\n";
+                cout << "[Успех] Количество предметов изменено на: " << s.subjectsCount << "\n";
             }
         }
     }
@@ -454,8 +534,7 @@ int main() {
     SetConsoleCP(1251); SetConsoleOutputCP(1251); setlocale(LC_ALL, "Russian");
 
     Settings cfg;
-
-    // Локальная загрузка настроек
+    
     ifstream inSettings("settings.txt");
     if (inSettings.good()) {
         string line;
@@ -466,20 +545,17 @@ int main() {
                 string val = line.substr(pos + 1);
                 if (key == "speciality") cfg.speciality = val;
                 else if (key == "studentName") cfg.studentName = val;
-                else if (key == "subjectsCount") try { cfg.subjectsCount = stoi(val); }
-                catch (...) {}
+                else if (key == "subjectsCount") try { cfg.subjectsCount = stoi(val); } catch (...) {}
             }
         }
-    }
-    else {
+    } else {
         ofstream out("settings.txt");
         out << "speciality=" << cfg.speciality << "\nstudentName=" << cfg.studentName << "\nsubjectsCount=" << cfg.subjectsCount << "\n";
     }
 
     list<string> studentsList;
     set<string> specialitiesSet;
-
-    // Локальная загрузка списков
+    
     ifstream stFile("students.txt");
     if (!stFile.good()) { ofstream("students.txt") << "Кристина\nИван\nАнна\nПётр\nОльга\n"; }
     stFile.close();
@@ -499,13 +575,14 @@ int main() {
         if (cin.fail()) { cin.clear(); cin.ignore(10000, '\n'); continue; }
 
         switch (menuChoice) {
-        case 1: startGame(cfg); break;
-        case 2: loadSavedGame(); break;
-        case 3: settingsMenu(cfg, studentsList, specialitiesSet); break;
-        case 4: showAbout(); break;
-        case 5: cout << "Выход...\n"; break;
-        default: cout << "Нет такого пункта.\n";
+            case 1: startGame(cfg); break;
+            case 2: loadSavedGame(); break;
+            case 3: settingsMenu(cfg, studentsList, specialitiesSet); break;
+            case 4: showAbout(); break;
+            case 5: cout << "Выход...\n"; break;
+            default: cout << "Нет такого пункта.\n";
         }
     }
     return 0;
 }
+
