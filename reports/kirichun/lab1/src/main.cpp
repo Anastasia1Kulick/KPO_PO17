@@ -51,7 +51,6 @@ int main() {
             cin.ignore();
             continue;
         }
-
         switch(choice) {
         case Start:
             startGame();
