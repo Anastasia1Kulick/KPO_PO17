@@ -3,7 +3,7 @@
 https://drive.google.com/drive/folders/1_zFEuzyo7UujEytf5MuwdUKtBnAo8YXg
 
 ссылка на электронную очередь: 
-https://docs.google.com/spreadsheets/d/1FFfxMHh_qEtyVldmp9tDRgwITp5Y6SA4VW2Xh6iDvrs/edit?usp=sharing
+https://docs.google.com/spreadsheets/d/1x0B7XcSn1XExBNB0QCyTq5gPPODQ6tboEs2Ct2TDWYc/edit?usp=drivesdk
 
 ссылка на электронную ведомость: 
 https://docs.google.com/spreadsheets/d/1esBjBMWBkn2GBHyKEAzKP-CuAJUphPBEWrAmjG0f6pg/edit?usp=sharing
